@@ -9,8 +9,15 @@
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { verifyToken } from "~/lib/jwt";
 
 import { db } from "~/server/db";
+
+export interface UserInterface {
+  id: string;
+  email: string;
+  name: string;
+}
 
 /**
  * 1. CONTEXT
@@ -24,7 +31,10 @@ import { db } from "~/server/db";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: { headers: Headers }) => {
+export const createTRPCContext = async (opts: {
+  headers: Headers;
+  user: UserInterface | null;
+}) => {
   return {
     db,
     ...opts,
@@ -50,6 +60,21 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       },
     };
   },
+});
+
+export const isAuthenticated = t.middleware(async ({ ctx, next }) => {
+  const authHeader = ctx.headers.get("authorization");
+  if (!authHeader) {
+    throw new Error("Not authenticated");
+  }
+
+  // Check if the token is valid
+  const decoded = await verifyToken(authHeader);
+  if (!decoded) {
+    throw new Error("Not authenticated");
+  }
+
+  return next();
 });
 
 /**

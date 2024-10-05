@@ -16,5 +16,19 @@ model User {
   name  String 
   password String
   createdAt DateTime @default(now())
+  Vehicle Vehicle[]
+}
 
+model Vehicle {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  brand String
+  model String
+  type  String
+  year  Int
+  plate String
+  vin  String
+  owner User @relation(fields: [ownerId], references: [id])
+  ownerId String @db.ObjectId
+  createdAt DateTime @default(now())
 }

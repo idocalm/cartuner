@@ -6,14 +6,14 @@ import {
   AccordionTrigger,
 } from "~/components/ui/accordion";
 import { Button } from "~/components/ui/button";
-
 import { HydrateClient } from "~/trpc/server";
+import ChartA from "./_components/charts/ChartA";
 
-export default async function Home() {
+const Home = () => {
   return (
     <HydrateClient>
-      <main className="flex h-screen min-h-screen w-screen flex-col justify-center bg-background text-white">
-        <div className="flex h-full flex-col gap-4 px-10 py-16">
+      <main className="flex min-h-screen w-screen flex-col pb-20 justify-center bg-background text-white">
+        <div className="flex h-full w-full flex-col gap-4  px-10 pt-16 pb-50">
           <div className="flex flex-col gap-1">
             <h1 className="text-8xl font-extrabold tracking-tighter text-greenish">
               Making sure your car is <br />
@@ -31,6 +31,26 @@ export default async function Home() {
               I'm a mechanic
             </Button>
           </div>
+          <br />
+          <div className="flex flex-col">
+            <h1 className="text-4xl font-bold">
+              Why do I need{" "}
+              <span className="text-greenish text-italic">cartuner</span>?
+            </h1>
+            <div className="w-20  h-[3px] bg-greenish my-2" />
+            <p className="text-sm text-muted-foreground">
+              We understand that finding a reliable mechanic can be a challenge.
+              That's why we're here to connect you with the best mechanics near
+              you.
+            </p>
+
+            <br />
+
+            <ChartA />
+          </div>
+
+          <br />
+
           <div>
             <h1 className="text-4xl font-bold">FAQs</h1>
             <Accordion type="single" collapsible>
@@ -67,8 +87,33 @@ export default async function Home() {
               </AccordionItem>
             </Accordion>
           </div>
+          <br />
+
+          <div className="flex flex-col gap-4">
+            <h1 className="text-4xl font-bold">Contact us</h1>
+            <p className="text-sm text-muted-foreground">
+              Have any questions or concerns? Feel free to reach out to us at{" "}
+              <a href="mailto:support@cartuner.com" className="text-primary">
+                support@cartuner.com
+              </a>
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground">
+              Made with ❤️ by{" "}
+              <a href="https://github.com/idocalm" className="text-primary">
+                @idocalm
+              </a>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} cartuner. All rights reserved.
+            </p>
+          </div>
         </div>
       </main>
     </HydrateClient>
   );
-}
+};
+
+export default Home;

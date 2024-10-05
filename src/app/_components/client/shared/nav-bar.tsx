@@ -9,9 +9,6 @@ import {
   MenubarSubTrigger,
   MenubarSubContent,
   MenubarCheckboxItem,
-  MenubarLabel,
-  MenubarRadioGroup,
-  MenubarRadioItem,
 } from "@radix-ui/react-menubar";
 import { MenubarShortcut } from "~/components/ui/menubar";
 

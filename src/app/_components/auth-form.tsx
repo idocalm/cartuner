@@ -44,7 +44,7 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
 
       setIsLoading(false);
 
-      router.push("/client/dashboard");
+      router.push("/screens/client/dashboard");
     },
     onError: () => {
       setIsLoading(false);
@@ -71,7 +71,7 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
       setEmail(user.email);
       setIsLoading(false);
 
-      router.push("/client/dashboard");
+      router.push("/screens/client/dashboard");
     },
     onError: (error: TRPCClientErrorLike<AppRouter>) => {
       setIsLoading(false);

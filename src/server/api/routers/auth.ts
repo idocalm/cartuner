@@ -1,8 +1,12 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  publicProcedure,
+  UserInterface,
+} from "~/server/api/trpc";
 import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
-import { generateToken } from "~/lib/jwt";
+import { generateToken, verifyToken } from "~/lib/jwt";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
@@ -31,7 +35,11 @@ export const authRouter = createTRPCRouter({
           });
         });
 
-      const token = await generateToken({ id: user.id, email: user.email });
+      const token = await generateToken({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      });
       return {
         token,
         user,
@@ -66,7 +74,12 @@ export const authRouter = createTRPCRouter({
         });
       }
 
-      const token = await generateToken({ id: user.id, email: user.email });
+      const token = await generateToken({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      });
+
       return {
         token,
         user,

@@ -6,12 +6,8 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("auth-token");
 
   const url = request.nextUrl.clone();
-  console.log("URL", url.toString());
 
-  if (
-    request.nextUrl.pathname.startsWith("/client/") ||
-    request.nextUrl.pathname.startsWith("/mechanic/")
-  ) {
+  if (request.nextUrl.pathname.startsWith("/screens/")) {
     if (!token) {
       url.pathname = "/auth/signin";
       return NextResponse.redirect(url.toString());
@@ -20,6 +16,10 @@ export async function middleware(request: NextRequest) {
       if (!decoded) {
         url.pathname = "/auth/signin";
         return NextResponse.redirect(url.toString());
+      } else {
+        const response = NextResponse.next();
+        response.headers.set("x-decoded-token", JSON.stringify(decoded));
+        return response;
       }
     }
   }
@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
     if (token) {
       const decoded = await verifyToken(token.value);
       if (decoded) {
-        url.pathname = "/client/dashboard";
+        url.pathname = "/screens/client/dashboard";
         return NextResponse.redirect(url.toString());
       }
     }
