@@ -10,11 +10,13 @@ import {
 } from "~/components/ui/resizable";
 import { useEffect, useState } from "react";
 import MyVehicles from "~/app/_components/client/my-vehicles/my-vehicles";
+import CartunersExplore from "~/app/_components/client/cartuners-explore/cartuners-explore";
 
 const Dashboard = () => {
   const name = api.clients.name.useQuery().data;
   const panels: Record<string, React.ReactNode> = {
     "My vehicles": <MyVehicles name={name!} />,
+    Cartuners: <CartunersExplore />,
   };
 
   const [selectedTab, setSelectedTab] = useState<string>("My vehicles");
@@ -34,6 +36,9 @@ const Dashboard = () => {
           <ResizablePanel className="min-w-[250px]" defaultSize={10}>
             <Sidebar
               onTabClick={(tabName: string) => {
+                if (tabName === selectedTab) {
+                  return;
+                }
                 setSelectedTab(tabName);
               }}
               categories={[

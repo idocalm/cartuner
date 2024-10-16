@@ -10,8 +10,24 @@ const issuer = process.env.JWT_ISSUER || "default-issuer";
 const audience = process.env.JWT_AUDIENCE || "default-audience";
 const expirationTime = process.env.JWT_EXPIRATION_TIME || "1h";
 
-const generateToken = (user: { id: string; email: string; name: string }) => {
-  const jwt = new SignJWT({ id: user.id, email: user.email, name: user.name })
+export enum TokenType {
+  User = "user",
+  Mechanic = "mechanic",
+  Admin = "admin",
+}
+
+const generateToken = (user: {
+  id: string;
+  email: string;
+  name: string;
+  type: TokenType;
+}) => {
+  const jwt = new SignJWT({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    type: user.type,
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setIssuer(issuer)

@@ -7,14 +7,16 @@ export async function middleware(request: NextRequest) {
 
   const url = request.nextUrl.clone();
 
-  if (request.nextUrl.pathname.startsWith("/screens/")) {
+  if (request.nextUrl.pathname.startsWith("/screens/mechanic")) {
     if (!token) {
-      url.pathname = "/auth/signin";
+      console.log("No token found");
+      url.pathname = "/auth/mechanic/signin";
       return NextResponse.redirect(url.toString());
     } else {
       const decoded = await verifyToken(token.value);
-      if (!decoded) {
-        url.pathname = "/auth/signin";
+      console.log(decoded);
+      if (!decoded || decoded.type !== "mechanic") {
+        url.pathname = "/auth/mechanic/signin";
         return NextResponse.redirect(url.toString());
       } else {
         const response = NextResponse.next();
@@ -24,11 +26,69 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (request.nextUrl.pathname.startsWith("/auth/")) {
+  if (request.nextUrl.pathname.startsWith("/screens/client")) {
+    if (!token) {
+      url.pathname = "/auth/client/signin";
+      return NextResponse.redirect(url.toString());
+    } else {
+      const decoded = await verifyToken(token.value);
+      console.log(decoded);
+      if (!decoded || decoded.type !== "user") {
+        url.pathname = "/auth/client/signin";
+        return NextResponse.redirect(url.toString());
+      } else {
+        const response = NextResponse.next();
+        response.headers.set("x-decoded-token", JSON.stringify(decoded));
+        return response;
+      }
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith("/screens/admin")) {
+    if (!token) {
+      url.pathname = "/auth/admin/signin";
+      return NextResponse.redirect(url.toString());
+    } else {
+      const decoded = await verifyToken(token.value);
+      console.log(decoded);
+      if (!decoded || decoded.type !== "admin") {
+        url.pathname = "/auth/admin/signin";
+        return NextResponse.redirect(url.toString());
+      } else {
+        const response = NextResponse.next();
+        response.headers.set("x-decoded-token", JSON.stringify(decoded));
+        return response;
+      }
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith("/auth/client/")) {
     if (token) {
       const decoded = await verifyToken(token.value);
-      if (decoded) {
+      if (decoded && decoded.type === "user") {
         url.pathname = "/screens/client/dashboard";
+        return NextResponse.redirect(url.toString());
+      }
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith("/auth/mechanic/")) {
+    if (token) {
+      const decoded = await verifyToken(token.value);
+      if (decoded && decoded.type === "mechanic") {
+        url.pathname = "/screens/mechanic/dashboard";
+        return NextResponse.redirect(url.toString());
+      }
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith("/auth/admin")) {
+    console.log("Admin auth route");
+    if (token) {
+      const decoded = await verifyToken(token.value);
+      console.log(decoded);
+      if (decoded && decoded.type === "admin") {
+        url.pathname = "/screens/admin/dashboard";
         return NextResponse.redirect(url.toString());
       }
     }

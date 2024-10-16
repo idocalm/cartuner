@@ -10,13 +10,65 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model User {
+model ClientUser {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   email String @unique
   name  String 
   password String
   createdAt DateTime @default(now())
   Vehicle Vehicle[]
+
+  Review Review[]
+}
+
+model Review {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String
+  stars Int
+  storeId String @db.ObjectId
+  createdAt DateTime @default(now())
+  store Store @relation(fields: [storeId], references: [id])
+  writer ClientUser @relation(fields: [writerId], references: [id])
+  writerId String @db.ObjectId
+}
+
+model MechanicUser {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  storeIds String[] @db.ObjectId
+  stores MechanicStores[]
+}
+
+
+model Store {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  url   String
+  image String @default("https://via.placeholder.com/150") 
+  address String
+  country String
+  city String
+  postalCode String
+  phone String
+  publicationStatus String @default("Pending for approval")
+  createdAt DateTime @default(now())
+  establishedAt DateTime
+  ownerId String? @db.ObjectId 
+  mechanics MechanicStores[]
+  stars Int @default(0)
+  reviews Review[] 
+  Incident Incident[]
+}
+
+model MechanicStores {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  storeId String @db.ObjectId
+  mechanicId String @db.ObjectId
+  store Store @relation(fields: [storeId], references: [id])
+  mechanic MechanicUser @relation(fields: [mechanicId], references: [id])
 }
 
 model Vehicle {
@@ -27,8 +79,45 @@ model Vehicle {
   type  String
   year  Int
   plate String
+  image String  @default("https://via.placeholder.com/150") 
   vin  String
-  owner User @relation(fields: [ownerId], references: [id])
   ownerId String @db.ObjectId
+  owner ClientUser @relation(fields: [ownerId], references: [id])
+  createdAt DateTime @default(now())
+  Incident Incident[]
+  notes String @default("")
+  Repair Repair[]
+}
+
+model Incident {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String
+  vehicle Vehicle @relation(fields: [id], references: [id])
+  vehicleId String @db.ObjectId
+  status String @default("Pending")
+  ownerId String @db.ObjectId
+  createdAt DateTime @default(now())
+  store Store @relation(fields: [id], references: [id])
+  Repair Repair[]
+}
+
+model Repair {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String
+  cost  Float
+  incidentId String @db.ObjectId
+  ownerId String @db.ObjectId
+  vehicleId String @db.ObjectId
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  incident Incident @relation(fields: [incidentId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model AdminUser {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  username String @unique
+  password String
   createdAt DateTime @default(now())
 }

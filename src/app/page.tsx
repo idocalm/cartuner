@@ -25,10 +25,10 @@ const Home = () => {
           </div>
           <div className="flex flex-row gap-4">
             <Button variant="default" size="lg">
-              <Link href="/auth/signup">Let's get started</Link>
+              <Link href="/auth/client/signup">Let's get started</Link>
             </Button>
             <Button variant="secondary" size="lg">
-              I'm a mechanic
+              <Link href="/auth/mechanic/signup">I'm a mechanic</Link>
             </Button>
           </div>
           <br />

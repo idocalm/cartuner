@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import UserAuthForm from "~/app/_components/auth-form";
+import UserAuthForm from "~/app/_components/user-auth-form";
 
 const SignUpPage = () => {
   return (

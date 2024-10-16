@@ -16,7 +16,7 @@ import { useAuth } from "./auth-context";
 import Cookies from "js-cookie";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  type: "signup" | "signin";
+  type: "signup" | "signin" | "mechanic-signin";
 }
 
 const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
@@ -46,7 +46,7 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
 
       router.push("/screens/client/dashboard");
     },
-    onError: () => {
+    onError: (error) => {
       setIsLoading(false);
       toast({
         title: "Account creation failed",
@@ -86,6 +86,33 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
     },
   });
 
+  const mechanicSignIn = api.mechanics.login.useMutation({
+    onSuccess: ({ token, user }) => {
+      toast({
+        title: "Signed in successfully",
+        description: "Welcome back to cartuner!",
+      });
+
+      Cookies.set("auth-token", token);
+      setToken(token);
+      setEmail(user.email);
+      setIsLoading(false);
+
+      router.push("/screens/mechanic/dashboard");
+    },
+    onError: (error: TRPCClientErrorLike<AppRouter>) => {
+      setIsLoading(false);
+      setErrorMessage(error.message);
+      toast({
+        title: "Sign in failed",
+        description:
+          "Something went wrong! Make sure you're using a valid email & password and try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    },
+  });
+
   const onSubmit = () => {
     setIsLoading(true);
 
@@ -95,8 +122,13 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
         password,
         name,
       });
-    } else {
+    } else if (type === "signin") {
       signin.mutate({
+        email,
+        password,
+      });
+    } else if (type === "mechanic-signin") {
+      mechanicSignIn.mutate({
         email,
         password,
       });
@@ -162,18 +194,19 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
         {(type === "signup" && (
           <p className="text-xs text-muted-foreground text-center">
             Already have an account?{" "}
-            <a href="/auth/signin" className="text-primary">
+            <a href="/auth/client/signin" className="text-primary">
               Sign in
             </a>
           </p>
-        )) || (
+        )) || <></>}
+        {(type === "signin" && (
           <p className="text-xs text-muted-foreground text-center">
             Don't have an account?{" "}
-            <a href="/auth/signup" className="text-primary">
+            <a href="/auth/client/signup" className="text-primary">
               Sign up
             </a>
           </p>
-        )}
+        )) || <></>}
       </div>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

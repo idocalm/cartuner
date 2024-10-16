@@ -42,6 +42,7 @@ import {
   AlertDialogFooter,
 } from "~/components/ui/alert-dialog";
 import { Input } from "~/components/ui/input";
+import VehicleView from "../vehicle-view/vehicle-view";
 
 const NewVehicleSheet: React.FC = () => {
   const [brandOpen, setBrandOpen] = useState(false);
@@ -97,6 +98,7 @@ const NewVehicleSheet: React.FC = () => {
       name,
       vin: vin!,
       type: "all", // TODO: Implement type selection
+      notes: "",
     });
     setLoading(false);
   };
@@ -159,7 +161,8 @@ const VehicleCard: React.FC<{
     vin: string;
     type: string;
   };
-}> = ({ vehicle }) => {
+  showDetails: (id: string) => void;
+}> = ({ vehicle, showDetails }) => {
   const { toast } = useToast();
 
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
@@ -269,7 +272,13 @@ const VehicleCard: React.FC<{
             <p className="text-sm text-muted-foreground">{vehicle.vin}</p>
           </div>
         </div>
-        <Button variant="default" className="w-full">
+        <Button
+          variant="default"
+          className="w-full"
+          onClick={() => {
+            showDetails(vehicle.id);
+          }}
+        >
           View details
         </Button>
       </div>
@@ -277,8 +286,11 @@ const VehicleCard: React.FC<{
   );
 };
 
-const VehicleShowing: React.FC<{ type: string }> = ({ type }) => {
-  const vehicles = api.clients.vehicles.useQuery({ type });
+const VehicleShowing: React.FC<{
+  type: string;
+  showDetails: (id: string) => void;
+}> = ({ type, showDetails }) => {
+  const vehicles = api.clients.vehicles.useQuery(type);
 
   if (vehicles.isLoading) {
     return (
@@ -315,15 +327,31 @@ const VehicleShowing: React.FC<{ type: string }> = ({ type }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-auto">
       {vehicles.data?.map((vehicle) => (
-        <VehicleCard key={vehicle.id} vehicle={vehicle} />
+        <VehicleCard
+          key={vehicle.id}
+          vehicle={vehicle}
+          showDetails={showDetails}
+        />
       ))}
     </div>
   );
 };
 
 const MyVehicles: React.FC<{ name: string }> = ({ name }) => {
+  const [viewing, setViewing] = useState<boolean>(false);
+  const [viewVehicle, setViewVehicle] = useState<string>("");
+
+  const showDetails = (id: string) => {
+    setViewVehicle(id);
+    setViewing(true);
+  };
+
+  if (viewing) {
+    return <VehicleView id={viewVehicle} revert={() => setViewing(false)} />;
+  }
+
   return (
-    <div className="grid ">
+    <div className="grid">
       <div className="col-span-3 lg:col-span-4 lg:border-l">
         <div className="h-full px-4 py-6 lg:px-8">
           <h1 className="text-4xl font-bold tracking-tight my-5">
@@ -345,34 +373,34 @@ const MyVehicles: React.FC<{ name: string }> = ({ name }) => {
               </div>
             </div>
             <TabsContent value="all" className="border-none p-0 outline-none">
-              <VehicleShowing type="all" />
+              <VehicleShowing type="all" showDetails={showDetails} />
             </TabsContent>
             <TabsContent
               value="sedans"
               className="border-none p-0 outline-none"
             >
-              <VehicleShowing type="sedans" />
+              <VehicleShowing type="sedans" showDetails={showDetails} />
             </TabsContent>
             <TabsContent value="suvs" className="border-none p-0 outline-none">
-              <VehicleShowing type="suvs" />
+              <VehicleShowing type="suvs" showDetails={showDetails} />
             </TabsContent>
             <TabsContent
               value="hatchbacks"
               className="border-none p-0 outline-none"
             >
-              <VehicleShowing type="hatchbacks" />
+              <VehicleShowing type="hatchbacks" showDetails={showDetails} />
             </TabsContent>
             <TabsContent
               value="motorcycles"
               className="border-none p-0 outline-none"
             >
-              <VehicleShowing type="motorcycles" />
+              <VehicleShowing type="motorcycles" showDetails={showDetails} />
             </TabsContent>
             <TabsContent
               value="convertibles"
               className="border-none p-0 outline-none"
             >
-              <VehicleShowing type="convertibles" />
+              <VehicleShowing type="convertibles" showDetails={showDetails} />
             </TabsContent>
           </Tabs>
         </div>

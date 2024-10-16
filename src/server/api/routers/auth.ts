@@ -1,26 +1,28 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  publicProcedure,
-  UserInterface,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
-import { generateToken, verifyToken } from "~/lib/jwt";
+import { generateToken, TokenType } from "~/lib/jwt";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
-        password: z.string().min(6),
-        name: z.string().min(3),
+        email: z.string().email({
+          message: "Invalid email",
+        }),
+        password: z.string().min(6, {
+          message: "Password must be at least 6 characters",
+        }),
+        name: z.string().min(3, {
+          message: "Name must be at least 3 characters",
+        }),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { email, password } = input;
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await ctx.db.user
+      const user = await ctx.db.clientUser
         .create({
           data: {
             email,
@@ -39,6 +41,7 @@ export const authRouter = createTRPCRouter({
         id: user.id,
         email: user.email,
         name: user.name,
+        type: TokenType.User,
       });
       return {
         token,
@@ -48,13 +51,17 @@ export const authRouter = createTRPCRouter({
   login: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
-        password: z.string(),
+        email: z.string().email({
+          message: "Invalid email",
+        }),
+        password: z.string({
+          message: "Invalid password",
+        }),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { email, password } = input;
-      const user = await ctx.db.user.findUnique({
+      const user = await ctx.db.clientUser.findUnique({
         where: { email },
       });
 
@@ -78,6 +85,7 @@ export const authRouter = createTRPCRouter({
         id: user.id,
         email: user.email,
         name: user.name,
+        type: TokenType.User,
       });
 
       return {
