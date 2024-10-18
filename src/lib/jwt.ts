@@ -1,5 +1,3 @@
-import jwt from "jsonwebtoken";
-import { createSecretKey } from "crypto";
 import { SignJWT } from "jose/jwt/sign";
 import { jwtVerify } from "jose/jwt/verify";
 
@@ -14,6 +12,7 @@ export enum TokenType {
   User = "user",
   Mechanic = "mechanic",
   Admin = "admin",
+  StoreOwner = "store_owner",
 }
 
 const generateToken = (user: {
@@ -49,7 +48,7 @@ const verifyToken = async (token: string) => {
 
     return payload;
   } catch (error) {
-    return null;
+    return error;
   }
 };
 

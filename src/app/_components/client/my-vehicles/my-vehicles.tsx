@@ -43,6 +43,7 @@ import {
 } from "~/components/ui/alert-dialog";
 import { Input } from "~/components/ui/input";
 import VehicleView from "../vehicle-view/vehicle-view";
+import { Vehicle } from "~/app/types";
 
 const NewVehicleSheet: React.FC = () => {
   const [brandOpen, setBrandOpen] = useState(false);
@@ -118,7 +119,7 @@ const NewVehicleSheet: React.FC = () => {
           <SheetTitle>Add a new vehicle</SheetTitle>
           <SheetDescription>
             Fill out the form below to add a new vehicle to your garage, so you
-            can keep track of it's maintenancep and incidents.
+            can keep track of it&apos;s maintenancep and incidents.
           </SheetDescription>
         </SheetHeader>
         <NewVehicleBody
@@ -177,7 +178,7 @@ const VehicleCard: React.FC<{
       setDeleteConfirmation("");
       setShowDeleteDialog(false);
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Failed to delete vehicle",
         description: "An error occurred while deleting the vehicle.",
@@ -216,11 +217,11 @@ const VehicleCard: React.FC<{
                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will PERMANENTLY DELETE
-                      your vehicle. If you're sure, type{" "}
+                      your vehicle. If you&apos;re sure, type{" "}
                       <span className="font-extrabold tracking-tighter">
                         {vehicle.name}
                       </span>{" "}
-                      in the input below and click "Continue".
+                      in the input below and click &ldquo;Continue&ldquo;.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <Input
@@ -295,7 +296,7 @@ const VehicleShowing: React.FC<{
   if (vehicles.isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-auto">
-        {Array.from({ length: 10 }).map((_, index) => (
+        {Array.from({ length: 10 }).map((_) => (
           <div key={uuid()} className="flex items-center space-x-4">
             <Skeleton className="h-16 w-16 rounded-full" />
             <div className="space-y-2">
@@ -318,7 +319,8 @@ const VehicleShowing: React.FC<{
           Seems like you have no vehicles registered in this category
         </AlertTitle>
         <AlertDescription>
-          You can always add a new vehicle by clicking "New vehicle" button.
+          You can always add a new vehicle by clicking &ldquo;New vehicle&ldquo;
+          button.
         </AlertDescription>
       </Alert>
     );
@@ -326,7 +328,7 @@ const VehicleShowing: React.FC<{
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-auto">
-      {vehicles.data?.map((vehicle) => (
+      {vehicles.data?.map((vehicle: Vehicle) => (
         <VehicleCard
           key={vehicle.id}
           vehicle={vehicle}
@@ -362,7 +364,7 @@ const MyVehicles: React.FC<{ name: string }> = ({ name }) => {
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="sedans">Sedans</TabsTrigger>
-                <TabsTrigger value="suvs">SUV's</TabsTrigger>
+                <TabsTrigger value="suvs">SUV&apos;s</TabsTrigger>
                 <TabsTrigger value="hatchbacks">Hatchbacks</TabsTrigger>
                 <TabsTrigger value="motorcycles">Motorcycles</TabsTrigger>
                 <TabsTrigger value="convertibles">Convertibles</TabsTrigger>

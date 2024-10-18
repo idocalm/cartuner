@@ -12,14 +12,13 @@ import { useState } from "react";
 
 const AdminPage = () => {
   const { setToken } = useAuth();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
 
   const signin = api.admin.login.useMutation({
-    onSuccess: ({ token, user }) => {
+    onSuccess: ({ token }) => {
       toast({
         title: "Signed in successfully",
         duration: 1000,
@@ -28,12 +27,9 @@ const AdminPage = () => {
       Cookies.set("auth-token", token);
       setToken(token);
 
-      setIsLoading(false);
-
       router.push("/screens/admin/dashboard");
     },
-    onError: (error) => {
-      setIsLoading(false);
+    onError: () => {
       toast({
         title: "Sign in failed",
         description:
@@ -90,7 +86,6 @@ const AdminPage = () => {
           <Button
             className="my-2"
             onClick={() => {
-              setIsLoading(true);
               signin.mutate({ username, password });
             }}
           >

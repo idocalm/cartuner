@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import { useToast } from "~/hooks/use-toast";
 import Loading from "../shared/loading";
 import VehicleCard from "./vehicle-card";
-import { Vehicle } from "~/app/types";
+import type { Vehicle } from "~/app/types";
 import { Separator } from "~/components/ui/separator";
 
 import { Card, CardContent } from "~/components/ui/card";
@@ -45,7 +45,12 @@ const VehicleView: React.FC<{
               revert();
             },
           },
-          { name: vehicle.data?.name || "Vehicle", onClick: () => {} },
+          {
+            name: vehicle.data?.name ?? "Vehicle",
+            onClick: () => {
+              console.log("clicked");
+            },
+          },
         ]}
       />
 

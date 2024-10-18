@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  isAuthenticated,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import bcrypt from "bcryptjs";
 import { generateToken, TokenType } from "~/lib/jwt";
 import { TRPCError } from "@trpc/server";
@@ -40,7 +36,7 @@ export const mechanicsRouter = createTRPCRouter({
         },
       });
       const hashedPassword = await bcrypt.hash(input.password, 10);
-      const ownerUser = await ctx.db.mechanicUser.create({
+      const ownerUser = await ctx.db.storeOwnerUser.create({
         data: {
           email: input.email,
           password: hashedPassword,
@@ -60,7 +56,7 @@ export const mechanicsRouter = createTRPCRouter({
         id: ownerUser.id,
         email: ownerUser.email,
         name: input.name + " owner",
-        type: TokenType.Mechanic,
+        type: TokenType.StoreOwner,
       });
 
       return {
@@ -87,14 +83,27 @@ export const mechanicsRouter = createTRPCRouter({
         where: { email },
       });
 
-      if (!user) {
+      const ownerUser = await ctx.db.storeOwnerUser.findUnique({
+        where: { email },
+      });
+
+      if (!user && !ownerUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invalid email",
+        });
+      }
+      const match = user ? user : ownerUser;
+      const matchType = user ? "mechanic" : "store owner";
+
+      if (!match) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Invalid email",
         });
       }
 
-      const passwordMatch = await bcrypt.compare(password, user.password);
+      const passwordMatch = await bcrypt.compare(password, match.password);
 
       if (!passwordMatch) {
         throw new TRPCError({
@@ -104,10 +113,11 @@ export const mechanicsRouter = createTRPCRouter({
       }
 
       const token = await generateToken({
-        id: user.id,
-        email: user.email,
-        name: "Mechanic",
-        type: TokenType.Mechanic,
+        id: match.id,
+        email: match.email,
+        name: matchType == "mechanic" ? "Mechanic" : "Store owner",
+        type:
+          matchType == "mechanic" ? TokenType.Mechanic : TokenType.StoreOwner,
       });
 
       return {

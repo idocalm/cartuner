@@ -19,7 +19,7 @@ export const clientsRouter = createTRPCRouter({
         return ctx.db.vehicle.findMany({
           where: {
             type: input,
-            ownerId: ctx.user!.id,
+            ownerId: ctx.user!.id as string,
           },
         });
       }

@@ -25,10 +25,10 @@ const Home = () => {
           </div>
           <div className="flex flex-row gap-4">
             <Button variant="default" size="lg">
-              <Link href="/auth/client/signup">Let's get started</Link>
+              <Link href="/auth/client/signup">Let&apos;s get started</Link>
             </Button>
             <Button variant="secondary" size="lg">
-              <Link href="/auth/mechanic/signup">I'm a mechanic</Link>
+              <Link href="/auth/mechanic/signup">I&apos;m a mechanic</Link>
             </Button>
           </div>
           <br />
@@ -40,8 +40,8 @@ const Home = () => {
             <div className="w-20  h-[3px] bg-greenish my-2" />
             <p className="text-sm text-muted-foreground">
               We understand that finding a reliable mechanic can be a challenge.
-              That's why we're here to connect you with the best mechanics near
-              you.
+              That&apos;s why we&apos;re here to connect you with the best
+              mechanics near you.
             </p>
 
             <br />
@@ -59,8 +59,8 @@ const Home = () => {
                   How much would I end up paying you?
                 </AccordionTrigger>
                 <AccordionContent>
-                  We don't charge you as a customer at all. Our revenue comes
-                  from the mechanics themselves
+                  We don&apos;t charge you as a customer at all. Our revenue
+                  comes from the mechanics themselves
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-2">
@@ -70,9 +70,10 @@ const Home = () => {
                 <AccordionContent>
                   Our crew of mechanics are all vetted and regularly reviewed by
                   our team. We also have a rating system in place to ensure that
-                  you're getting the best service possible. If you're not
-                  satisfied with the service, we'll make sure to connect you
-                  with another mechanic, and refund you the money you spent.
+                  you&apos;re getting the best service possible. If you&apos;re
+                  not satisfied with the service, we&apos;ll make sure to
+                  connect you with another mechanic, and refund you the money
+                  you spent.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-3">
@@ -81,8 +82,8 @@ const Home = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   You can sign up as a mechanic on our platform by filling out
-                  the form on our website. We'll get in touch with you shortly
-                  after.
+                  the form on our website. We&apos;ll get in touch with you
+                  shortly after.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

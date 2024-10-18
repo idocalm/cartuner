@@ -28,8 +28,6 @@ export const adminRouter = createTRPCRouter({
           message: "Invalid username",
         });
       }
-      const pass = await bcrypt.hash("admin", 10);
-      console.log(pass);
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
@@ -52,4 +50,41 @@ export const adminRouter = createTRPCRouter({
         user,
       };
     }),
+  storeRequests: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.store.findMany({
+      where: {
+        publicationStatus: "Pending for approval",
+      },
+    });
+  }),
+  approveStore: publicProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const store = await ctx.db.store.update({
+        where: {
+          id: input,
+        },
+        data: {
+          publicationStatus: "Accepted",
+        },
+      });
+
+      return store;
+    }),
+  denyStore: publicProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const store = await ctx.db.store.update({
+        where: {
+          id: input,
+        },
+        data: {
+          publicationStatus: "Denied",
+        },
+      });
+
+      return store;
+    }),
 });
+
+// TODO: Store requests must be made by an admin! AUTHENTICATION NEEDED

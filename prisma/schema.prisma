@@ -21,6 +21,14 @@ model ClientUser {
   Review Review[]
 }
 
+model StoreOwnerUser {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  Store Store[]
+}
+
 model Review {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   title String
@@ -38,8 +46,7 @@ model MechanicUser {
   email String @unique
   password String
   createdAt DateTime @default(now())
-  storeIds String[] @db.ObjectId
-  stores MechanicStores[]
+  MechanicsStores MechanicsStores[]
 }
 
 
@@ -57,18 +64,19 @@ model Store {
   createdAt DateTime @default(now())
   establishedAt DateTime
   ownerId String? @db.ObjectId 
-  mechanics MechanicStores[]
+  owner StoreOwnerUser? @relation(fields: [ownerId], references: [id])
+  mechanics MechanicsStores[]
   stars Int @default(0)
   reviews Review[] 
   Incident Incident[]
 }
 
-model MechanicStores {
+model MechanicsStores {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   storeId String @db.ObjectId
   mechanicId String @db.ObjectId
   store Store @relation(fields: [storeId], references: [id])
-  mechanic MechanicUser @relation(fields: [mechanicId], references: [id])
+  owner MechanicUser @relation(fields: [mechanicId], references: [id])
 }
 
 model Vehicle {

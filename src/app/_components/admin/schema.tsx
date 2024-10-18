@@ -8,6 +8,8 @@ export const taskSchema = z.object({
   status: z.string(),
   label: z.string(),
   priority: z.string(),
+  approved: z.function(),
+  denied: z.function(),
 });
 
 export type Task = z.infer<typeof taskSchema>;

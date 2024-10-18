@@ -30,7 +30,7 @@ export const authRouter = createTRPCRouter({
             name: input.name,
           },
         })
-        .catch((error) => {
+        .catch((error: { message: string }) => {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: error.message,
@@ -93,4 +93,7 @@ export const authRouter = createTRPCRouter({
         user,
       };
     }),
+  getId: publicProcedure.query(async ({ ctx }) => {
+    return ctx.user?.id;
+  }),
 });

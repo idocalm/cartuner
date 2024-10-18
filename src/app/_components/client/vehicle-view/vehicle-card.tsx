@@ -17,8 +17,8 @@ import { Separator } from "~/components/ui/separator";
 import { Textarea } from "~/components/ui/textarea";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/ui/icons";
-import { Vehicle } from "~/app/types";
-import { useEffect, useState } from "react";
+import type { Vehicle } from "~/app/types";
+import { useState } from "react";
 import Loading from "../shared/loading";
 import { api } from "~/trpc/react";
 import { useToast } from "~/hooks/use-toast";
@@ -51,7 +51,7 @@ const VehicleView: React.FC<{
         duration: 1000,
       });
     },
-    onError: (error) => {
+    onError: () => {
       setLoading(false);
       toast({
         title: "Error",

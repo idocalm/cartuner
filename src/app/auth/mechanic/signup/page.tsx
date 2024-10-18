@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { CalendarIcon, Check, ChevronsUpDown, Link } from "lucide-react";
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -24,7 +24,7 @@ import {
 } from "~/components/ui/popover";
 import { Calendar } from "~/components/ui/calendar";
 import { Separator } from "~/components/ui/separator";
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import {
   Command,
   CommandEmpty,
@@ -50,8 +50,8 @@ const PointProcess = () => {
       content: (
         <div>
           <p className="text-neutral-800 dark:text-neutral-200 font-normal">
-            Design and build your store's homepage and products, and enter some
-            basic information about your store.
+            Design and build your store&apos;s homepage and products, and enter
+            some basic information about your store.
           </p>
         </div>
       ),
@@ -456,7 +456,7 @@ const SignUpPage = () => {
         <br />
 
         <p className="text-center text-muted-foreground">
-          You can checkup on your store's status by visiting{" "}
+          You can checkup on your store&apos;s status by visiting{" "}
           <span className="text-greenish">/store/{storeId}</span>. or by
           clicking the button below.
         </p>
@@ -467,7 +467,7 @@ const SignUpPage = () => {
             router.push(`/store/${storeId}`);
           }}
         >
-          What's up with my store?
+          What&apos;s up with my store?
         </Button>
       </div>
     );
@@ -487,7 +487,7 @@ const SignUpPage = () => {
       </div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="secondary">Let's get started</Button>
+          <Button variant="secondary">Let&apos;s get started</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -525,7 +525,6 @@ const SignUpPage = () => {
                 variant="default"
                 disabled={!acceptedTerms || !isOwner || isLoading}
                 onClick={() => {
-                  console.log("submitting");
                   setIsLoading(true);
                   const est = establishedAt ? establishedAt : new Date();
                   submit.mutate({

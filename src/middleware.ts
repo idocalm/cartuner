@@ -9,13 +9,14 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith("/screens/mechanic")) {
     if (!token) {
-      console.log("No token found");
       url.pathname = "/auth/mechanic/signin";
       return NextResponse.redirect(url.toString());
     } else {
-      const decoded = await verifyToken(token.value);
-      console.log(decoded);
-      if (!decoded || decoded.type !== "mechanic") {
+      const decoded = (await verifyToken(token.value)) as { type: string };
+      if (
+        !decoded ||
+        (decoded.type != "mechanic" && decoded.type != "store_owner")
+      ) {
         url.pathname = "/auth/mechanic/signin";
         return NextResponse.redirect(url.toString());
       } else {
@@ -31,8 +32,7 @@ export async function middleware(request: NextRequest) {
       url.pathname = "/auth/client/signin";
       return NextResponse.redirect(url.toString());
     } else {
-      const decoded = await verifyToken(token.value);
-      console.log(decoded);
+      const decoded = (await verifyToken(token.value)) as { type: string };
       if (!decoded || decoded.type !== "user") {
         url.pathname = "/auth/client/signin";
         return NextResponse.redirect(url.toString());
@@ -49,8 +49,7 @@ export async function middleware(request: NextRequest) {
       url.pathname = "/auth/admin/signin";
       return NextResponse.redirect(url.toString());
     } else {
-      const decoded = await verifyToken(token.value);
-      console.log(decoded);
+      const decoded = (await verifyToken(token.value)) as { type: string };
       if (!decoded || decoded.type !== "admin") {
         url.pathname = "/auth/admin/signin";
         return NextResponse.redirect(url.toString());
@@ -64,7 +63,7 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith("/auth/client/")) {
     if (token) {
-      const decoded = await verifyToken(token.value);
+      const decoded = (await verifyToken(token.value)) as { type: string };
       if (decoded && decoded.type === "user") {
         url.pathname = "/screens/client/dashboard";
         return NextResponse.redirect(url.toString());
@@ -74,8 +73,11 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith("/auth/mechanic/")) {
     if (token) {
-      const decoded = await verifyToken(token.value);
-      if (decoded && decoded.type === "mechanic") {
+      const decoded = (await verifyToken(token.value)) as { type: string };
+      if (
+        decoded &&
+        (decoded.type === "mechanic" || decoded.type === "store_owner")
+      ) {
         url.pathname = "/screens/mechanic/dashboard";
         return NextResponse.redirect(url.toString());
       }
@@ -85,8 +87,7 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/auth/admin")) {
     console.log("Admin auth route");
     if (token) {
-      const decoded = await verifyToken(token.value);
-      console.log(decoded);
+      const decoded = (await verifyToken(token.value)) as { type: string };
       if (decoded && decoded.type === "admin") {
         url.pathname = "/screens/admin/dashboard";
         return NextResponse.redirect(url.toString());

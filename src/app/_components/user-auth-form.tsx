@@ -10,8 +10,8 @@ import { Label } from "~/components/ui/label";
 import { api } from "~/trpc/react";
 import { useToast } from "~/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { TRPCClientErrorLike } from "@trpc/client";
-import { AppRouter } from "~/server/api/root";
+import type { TRPCClientErrorLike } from "@trpc/client";
+import type { AppRouter } from "~/server/api/root";
 import { useAuth } from "./auth-context";
 import Cookies from "js-cookie";
 
@@ -46,7 +46,7 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
 
       router.push("/screens/client/dashboard");
     },
-    onError: (error) => {
+    onError: () => {
       setIsLoading(false);
       toast({
         title: "Account creation failed",
@@ -87,7 +87,7 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
   });
 
   const mechanicSignIn = api.mechanics.login.useMutation({
-    onSuccess: ({ token, user }) => {
+    onSuccess: ({ token }) => {
       toast({
         title: "Signed in successfully",
         description: "Welcome back to cartuner!",
@@ -95,7 +95,6 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
 
       Cookies.set("auth-token", token);
       setToken(token);
-      setEmail(user.email);
       setIsLoading(false);
 
       router.push("/screens/mechanic/dashboard");
@@ -201,7 +200,7 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
         )) || <></>}
         {(type === "signin" && (
           <p className="text-xs text-muted-foreground text-center">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a href="/auth/client/signup" className="text-primary">
               Sign up
             </a>

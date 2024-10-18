@@ -1,7 +1,6 @@
 import {
   CarIcon,
   Grid2X2Icon,
-  Icon,
   PaintBucket,
   ShipWheelIcon,
   SquareStackIcon,

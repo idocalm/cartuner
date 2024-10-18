@@ -1,136 +1,101 @@
 "use client";
 
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
-
 import { columns } from "~/app/_components/admin/columns";
-import { useState } from "react";
-import data from "~/data/data.json";
+import { useEffect, useState } from "react";
 
-import { DataTableToolbar } from "~/app/_components/admin/toolbar";
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
-
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = useState({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
-
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnFilters,
-    },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-  });
-
-  return (
-    <div className="space-y-4">
-      <DataTableToolbar table={table} />
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
-}
+import { api } from "~/trpc/react";
+import { useToast } from "~/hooks/use-toast";
+import DataTable from "~/app/_components/admin/data-table";
 
 const AdminDashboard = () => {
+  const storeRequests = api.admin.storeRequests.useQuery();
+  const { toast } = useToast();
+
+  const storeApprove = api.admin.approveStore.useMutation({
+    onSuccess: () => {
+      storeRequests.refetch();
+      toast({
+        title: "Store approved",
+        description: "This store has been approved and is now live.",
+        duration: 2000,
+      });
+    },
+  });
+
+  const storeDeny = api.admin.denyStore.useMutation({
+    onSuccess: () => {
+      storeRequests.refetch();
+      toast({
+        title: "Vehicle deleted",
+        description: "The vehicle has been deleted from your garage.",
+        duration: 2000,
+      });
+    },
+  });
+
+  const [data, setData] = useState<
+    {
+      id: string;
+      title: string;
+      status: string;
+      label: string;
+      priority: string;
+      approved: () => void;
+      denied: () => void;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    setData([]);
+    if (storeRequests.status === "success" && storeRequests.data) {
+      for (const store of storeRequests.data) {
+        const dateDiff =
+          new Date().getTime() - new Date(store.createdAt).getTime();
+        const diffHours = Math.floor(dateDiff / (1000 * 60 * 60));
+        let priority = "low";
+        if (diffHours > 24) {
+          priority = "high";
+        }
+
+        let status = "todo";
+        if (store.publicationStatus === "Accepted") {
+          status = "accepted";
+        }
+        if (store.publicationStatus === "Denied") {
+          status = "denied";
+        }
+
+        const approved = () => {
+          storeApprove.mutate(store.id);
+        };
+
+        const denied = () => {
+          storeDeny.mutate(store.id);
+        };
+
+        setData((prev) => [
+          ...prev,
+          {
+            id: store.id,
+            title: store.name,
+            status,
+            label: "store_request",
+            priority,
+            approved,
+            denied,
+          },
+        ]);
+      }
+    }
+  }, [storeRequests.status]);
+
   return (
     <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
       <div className="flex items-center justify-between space-y-2">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
           <p className="text-muted-foreground">
-            Here's a quick overview of what's happening.
+            Here&apos;s a quick overview of what&apos;s happening.
           </p>
         </div>
       </div>
