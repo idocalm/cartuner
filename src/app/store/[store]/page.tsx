@@ -21,7 +21,6 @@ import {
 import React, { useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 const EditStoreName: React.FC<{
   saveName: (name: string) => void;
@@ -196,7 +195,7 @@ const StorePage = () => {
       <div>
         {storeQuery.data && (
           <>
-            <Image
+            <img
               src={storeQuery.data.image}
               alt="Store logo"
               className="w-full h-60 object-cover"
@@ -220,17 +219,19 @@ const StorePage = () => {
           ) : (
             <>
               <h1 className="text-6xl font-bold tracking-tighter text-center ">
-                {storeQuery.data!.name}
+                {storeQuery.data?.name}
               </h1>
               <div className="flex flex-row gap-3 items-center">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    router.push(`/store/${store}/manage`);
-                  }}
-                >
-                  Manage
-                </Button>
+                {storeQuery.data?.ownerId === currentUserId.data && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      router.push(`/store/${store}/manage`);
+                    }}
+                  >
+                    Manage
+                  </Button>
+                )}
                 <EditStoreName
                   show={currentUserId.data === ownerId}
                   saveName={(name) => {

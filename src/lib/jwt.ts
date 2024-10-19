@@ -48,7 +48,7 @@ const verifyToken = async (token: string) => {
 
     return payload;
   } catch (error) {
-    return error;
+    return null;
   }
 };
 

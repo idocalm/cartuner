@@ -10,15 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { api } from "~/trpc/react";
+import type { StoreOwnerUser } from "@prisma/client";
 
-const UserNav: React.FC<{ storeId: string }> = ({ storeId }) => {
-  const owner = api.store.getOwner.useQuery(storeId);
-
-  if (!owner.data || owner.isLoading) {
-    return <></>;
-  }
-
+const UserNav: React.FC<{
+  owner: StoreOwnerUser;
+  showManageMechanics: (value: boolean) => void;
+}> = ({ showManageMechanics, owner }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -32,9 +29,7 @@ const UserNav: React.FC<{ storeId: string }> = ({ storeId }) => {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {owner.data?.email}
-            </p>
+            <p className="text-sm font-medium leading-none">{owner.email}</p>
             <p className="text-xs leading-none text-muted-foreground">
               Store owner
             </p>
@@ -42,10 +37,16 @@ const UserNav: React.FC<{ storeId: string }> = ({ storeId }) => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Manage store&apos;s mechanics</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              showManageMechanics(true);
+            }}
+          >
+            Manage store&apos;s mechanics
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => {}}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
