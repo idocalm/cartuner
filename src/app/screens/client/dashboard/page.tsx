@@ -26,7 +26,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     setCurrentPanel(panels[selectedTab]);
-  }, [selectedTab, name, panels]);
+  }, [selectedTab]);
 
   return (
     <main className="flex h-screen min-h-screen w-screen flex-col">

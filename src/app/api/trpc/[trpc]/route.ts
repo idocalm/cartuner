@@ -14,7 +14,15 @@ const createContext = async (req: NextRequest) => {
   const token = req.cookies.get("auth-token");
   let user = null;
   if (token) {
-    const decoded = (await verifyToken(token.value)) as UserInterface;
+    const decoded = await verifyToken(token.value);
+
+    if (!decoded) {
+      return createTRPCContext({
+        headers: req.headers,
+        user: null,
+      });
+    }
+
     user = {
       id: decoded.id,
       name: decoded.name,

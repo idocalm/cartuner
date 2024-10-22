@@ -17,7 +17,6 @@ model ClientUser {
   password String
   createdAt DateTime @default(now())
   Vehicle Vehicle[]
-
   Review Review[]
 }
 
@@ -26,7 +25,7 @@ model StoreOwnerUser {
   email String @unique
   password String
   createdAt DateTime @default(now())
-  Store Store[]
+  stores Store[]
 }
 
 model Review {
@@ -70,6 +69,8 @@ model Store {
   stars Int @default(0)
   reviews Review[] 
   Incident Incident[]
+
+  Product Product[]
 }
 
 model MechanicsStores {
@@ -128,5 +129,23 @@ model AdminUser {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   username String @unique
   password String
+  createdAt DateTime @default(now())
+}
+
+model InviteToken {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  expiresAt DateTime 
+  storeId String @db.ObjectId
+}
+
+model Product {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  price Float
+  description String
+  image String @default("https://via.placeholder.com/150")
+  category String
+  storeId String @db.ObjectId
+  store Store @relation(fields: [storeId], references: [id])
   createdAt DateTime @default(now())
 }

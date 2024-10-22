@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 
-import ErorrPanel from "~/app/_components/client/shared/error";
+import ErrorPanel from "~/app/_components/client/shared/error";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
@@ -151,7 +151,7 @@ const StorePage = () => {
   const router = useRouter();
 
   if (storeQuery.error) {
-    return <ErorrPanel message={storeQuery.error.message} />;
+    return <ErrorPanel message={storeQuery.error.message} />;
   }
 
   if (storeQuery.data?.publicationStatus == "Pending for approval") {

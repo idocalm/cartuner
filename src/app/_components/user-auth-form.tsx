@@ -16,7 +16,8 @@ import { useAuth } from "./auth-context";
 import Cookies from "js-cookie";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  type: "signup" | "signin" | "mechanic-signin";
+  type: "signup" | "signin" | "mechanic-signin" | "mechanic-join";
+  inviteToken?: string;
 }
 
 const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
@@ -112,6 +113,32 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
     },
   });
 
+  const mechanicJoin = api.store.newMechanic.useMutation({
+    onSuccess: ({ token }) => {
+      toast({
+        title: "Account created successfully",
+        description: "Welcome to cartuner! You're now signed in.",
+        duration: 1000,
+      });
+
+      Cookies.set("auth-token", token);
+      setToken(token);
+      setIsLoading(false);
+
+      router.push("/screens/mechanic/dashboard");
+    },
+    onError: () => {
+      setIsLoading(false);
+      toast({
+        title: "Account creation failed",
+        description:
+          "Something went wrong! Make sure you're using a valid email & password and try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    },
+  });
+
   const onSubmit = () => {
     setIsLoading(true);
 
@@ -130,6 +157,13 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
       mechanicSignIn.mutate({
         email,
         password,
+      });
+    } else if (type === "mechanic-join" && props.inviteToken) {
+      mechanicJoin.mutate({
+        email,
+        password,
+        name,
+        inviteToken: props.inviteToken,
       });
     }
   };
@@ -165,7 +199,7 @@ const UserAuthForm = ({ className, type, ...props }: UserAuthFormProps) => {
               onChange={(event) => setPassword(event.target.value)}
               disabled={isLoading}
             />
-            {type === "signup" && (
+            {(type === "signup" || type === "mechanic-join") && (
               <Input
                 id="name"
                 placeholder="Name"

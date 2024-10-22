@@ -19,7 +19,7 @@ const Home = () => {
               Making sure your car is <br />
               in good hands.
             </h1>
-            <h2 className="text-2xl font-bold text-hint">
+            <h2 className="text-2xl font-bold text-hint tracking-tighter">
               Connecting you with the best mechanics near you
             </h2>
           </div>
@@ -33,7 +33,7 @@ const Home = () => {
           </div>
           <br />
           <div className="flex flex-col">
-            <h1 className="text-4xl font-bold">
+            <h1 className="text-4xl font-bold tracking-tighter">
               Why do I need{" "}
               <span className="text-greenish text-italic">cartuner</span>?
             </h1>

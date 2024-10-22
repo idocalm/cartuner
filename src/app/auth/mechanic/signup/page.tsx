@@ -562,6 +562,4 @@ const SignUpPage = () => {
   );
 };
 
-// TODO: Confetti animation
-
 export default SignUpPage;
