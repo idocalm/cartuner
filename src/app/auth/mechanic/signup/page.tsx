@@ -553,7 +553,7 @@ const SignUpPage = () => {
         </DialogContent>
       </Dialog>
       <a
-        className="text-center text-muted-foreground"
+        className="text-center text-muted-foreground font-bold tracking-tighter"
         href="/auth/mechanic/signin"
       >
         Already have an account? Sign in.

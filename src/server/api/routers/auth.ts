@@ -96,4 +96,7 @@ export const authRouter = createTRPCRouter({
   getId: publicProcedure.query(async ({ ctx }) => {
     return ctx.user?.id;
   }),
+  isConnected: publicProcedure.query(async ({ ctx }) => {
+    return !!ctx.user;
+  }),
 });

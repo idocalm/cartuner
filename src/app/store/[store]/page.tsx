@@ -5,9 +5,10 @@ import ErrorPanel from "~/app/_components/client/shared/error";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
-import { Camera, Pen, TriangleAlertIcon } from "lucide-react";
+import { Camera, Pen, ShoppingBag, TriangleAlertIcon } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
 import { Input } from "~/components/ui/input";
+import useCart from "~/hooks/use-cart";
 import {
   Drawer,
   DrawerClose,
@@ -18,9 +19,21 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/components/ui/drawer";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import ProductsView from "~/app/_components/manage-store/products-view";
+import { toast } from "sonner";
+import { Product } from "@prisma/client";
+
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "~/components/ui/sheet";
+import Cart from "~/app/_components/store/cart";
 
 const EditStoreName: React.FC<{
   saveName: (name: string) => void;
@@ -133,8 +146,10 @@ const StorePage = () => {
   const { store } = useParams<{ store: string }>();
 
   const storeQuery = api.store.fetch.useQuery(store);
+
   const ownerId = storeQuery.data?.ownerId;
   const currentUserId = api.auth.getId.useQuery();
+  const products = api.store.getProducts.useQuery(store);
 
   const updateName = api.store.updateName.useMutation({
     onSuccess: () => {
@@ -162,7 +177,7 @@ const StorePage = () => {
             <div className="flex flex-col space-y-4 w-full items-center p-16">
               <TriangleAlertIcon size={80} />
               <p className="text-center text-lg font-semibold tracking-tighter">
-                Your store is pending for approval
+                Store is pending for approval
               </p>
             </div>
           </CardContent>
@@ -179,7 +194,7 @@ const StorePage = () => {
             <div className="flex flex-col space-y-4 w-full items-center p-16">
               <TriangleAlertIcon size={80} className="text-red-500" />
               <p className="text-center text-lg font-semibold tracking-tighter">
-                Your store has been denied
+                Store has been denied.
               </p>
             </div>
           </CardContent>
@@ -189,9 +204,39 @@ const StorePage = () => {
   }
 
   const formattedTime = storeQuery.data?.establishedAt.toLocaleDateString();
+  const cart = useCart();
+
+  useEffect(() => {
+    cart.load();
+  }, []);
+
+  const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <div className="h-screen w-screen flex flex-col">
+      <Sheet open={cartOpen} onOpenChange={setCartOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Your cart</SheetTitle>
+            <SheetDescription>
+              Here are the items you've added to your cart
+            </SheetDescription>
+          </SheetHeader>
+          <br />
+          <Cart />
+        </SheetContent>
+      </Sheet>
+      <div className="absolute right-5 top-5">
+        <Button
+          variant="outline"
+          disabled={cartOpen}
+          onClick={() => {
+            setCartOpen(true);
+          }}
+        >
+          <ShoppingBag className="w-5" />
+        </Button>
+      </div>
       <div>
         {storeQuery.data && (
           <>
@@ -259,6 +304,43 @@ const StorePage = () => {
                 Est. {formattedTime}
               </p>
             </div>
+          )}
+        </div>
+
+        <Separator />
+        <div className="flex flex-col gap-4 items-start">
+          <h1 className="text-4xl font-bold tracking-tighter text-center ">
+            Products
+          </h1>
+          {storeQuery.isLoading ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-6 w-48" />
+            </div>
+          ) : (
+            <ProductsView
+              products={products.data || []}
+              filter=""
+              isOwner={ownerId === currentUserId.data}
+              requestRefresh={() => {
+                products.refetch();
+              }}
+              addToCart={(product: Product) => {
+                cart.add(product);
+                toast("Product added to cart", {
+                  description: `1 '${product.name}' added to cart`,
+                  action: {
+                    label: "Undo",
+                    onClick: () => {
+                      cart.remove(product.id);
+                      toast("Product removed from cart", {
+                        description: `1 '${product.name}' removed from your cart`,
+                      });
+                    },
+                  },
+                });
+              }}
+            />
           )}
         </div>
       </div>

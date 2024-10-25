@@ -39,7 +39,7 @@ import {
   CommandList,
 } from "~/components/ui/command";
 import { Icons } from "~/components/ui/icons";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Trash } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import ProductsView from "~/app/_components/manage-store/products-view";
 import { Label } from "~/components/ui/label";
@@ -150,6 +150,8 @@ const ProductsPanel: React.FC<{ store: string }> = ({ store }) => {
   const products = api.store.getProducts.useQuery(store);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const owner = api.store.isOwner.useQuery(store);
 
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState<number>(0);
@@ -157,10 +159,20 @@ const ProductsPanel: React.FC<{ store: string }> = ({ store }) => {
   const [productCategory, setProductCategory] = useState("");
   const [productDescription, setProductDescription] = useState("");
 
+  const [productFilter, setProductFilter] = useState("");
+
   const createProduct = api.store.createProduct.useMutation({
     onSuccess: () => {
       setLoading(false);
       setOpen(false);
+      setCreating(false);
+
+      setProductName("");
+      setProductPrice(0);
+      setProductImage("");
+      setProductCategory("");
+      setProductDescription("");
+
       products.refetch();
     },
   });
@@ -178,8 +190,14 @@ const ProductsPanel: React.FC<{ store: string }> = ({ store }) => {
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Products</h2>
         <div className="flex items-center space-x-2">
-          <Input placeholder="Search products" />
-          <AlertDialog>
+          <Input
+            placeholder="Search products"
+            value={productFilter}
+            onChange={(e) => {
+              setProductFilter(e.target.value);
+            }}
+          ></Input>
+          <AlertDialog open={creating} onOpenChange={setCreating}>
             <AlertDialogTrigger asChild>
               <Button>
                 <Plus size={24} />
@@ -323,7 +341,22 @@ const ProductsPanel: React.FC<{ store: string }> = ({ store }) => {
           </AlertDialog>
         </div>
       </div>
-      <ProductsView products={products.data ?? []} />
+      {productFilter.length > 0 ? (
+        <p
+          className="text-sm text-gray-500 hover:cursor-pointer underline"
+          onClick={() => setProductFilter("")}
+        >
+          Clear search
+        </p>
+      ) : (
+        <></>
+      )}
+      <ProductsView
+        filter={productFilter}
+        products={products.data ?? []}
+        isOwner={owner.data ?? false}
+        requestRefresh={() => products.refetch()}
+      />
     </div>
   );
 };

@@ -68,9 +68,8 @@ model Store {
   mechanics MechanicsStores[]
   stars Int @default(0)
   reviews Review[] 
-  Incident Incident[]
-
-  Product Product[]
+  incidents Incident[]
+  products Product[]
 }
 
 model MechanicsStores {
@@ -132,7 +131,7 @@ model AdminUser {
   createdAt DateTime @default(now())
 }
 
-model InviteToken {
+model InviteToken { 
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   expiresAt DateTime 
   storeId String @db.ObjectId
@@ -146,6 +145,7 @@ model Product {
   image String @default("https://via.placeholder.com/150")
   category String
   storeId String @db.ObjectId
+  active Boolean @default(true)
   store Store @relation(fields: [storeId], references: [id])
   createdAt DateTime @default(now())
 }

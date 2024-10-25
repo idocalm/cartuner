@@ -5,7 +5,7 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { ThemeProvider } from "./_components/theme-provider";
-import { Toaster } from "~/components/ui/toaster";
+import { Toaster } from "~/components/ui/sonner";
 import { AuthProvider } from "./_components/auth-context";
 
 export const metadata: Metadata = {
@@ -33,6 +33,7 @@ export default function RootLayout({
             </AuthProvider>
           </ThemeProvider>
         </TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );

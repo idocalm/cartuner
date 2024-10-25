@@ -304,7 +304,6 @@ export const storeRouter = createTRPCRouter({
     }),
 
   getProducts: publicProcedure
-    .use(isAuthenticated)
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return ctx.db.product.findMany({
@@ -329,6 +328,65 @@ export const storeRouter = createTRPCRouter({
       return ctx.db.product.create({
         data: {
           ...input,
+        },
+      });
+    }),
+  isOwner: publicProcedure
+    .use(isAuthenticated)
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const owner = ctx.db.storeOwnerUser.findFirst({
+        where: {
+          id: ctx.user!.id,
+          stores: {
+            some: {
+              id: input,
+            },
+          },
+        },
+      });
+      return owner !== null;
+    }),
+
+  updateProduct: publicProcedure
+    .use(isAuthenticated)
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        price: z.number(),
+        description: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // check that the user is the owner of the store
+      const owner = await ctx.db.storeOwnerUser.findFirst({
+        where: {
+          id: ctx.user!.id,
+          stores: {
+            some: {
+              products: {
+                some: {
+                  id: input.id,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!owner) {
+        throw new Error("Not the owner of this store");
+      }
+
+      return ctx.db.product.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          name: input.name,
+          price: input.price,
+          description: input.description,
         },
       });
     }),

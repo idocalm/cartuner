@@ -28,6 +28,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
+  /* TODO: Why is this here? If we're setting the token in the cookie, why do we need to set it in local storage? */
   const setToken = (newToken: string | null) => {
     if (newToken) {
       localStorage.setItem("authToken", newToken);
