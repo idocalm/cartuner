@@ -6,10 +6,14 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { TabsContent } from "~/components/ui/tabs";
-import { RecentSales } from "~/app/_components/manage-store/recent-sales";
+import RecentSales from "~/app/_components/manage-store/recent-sales";
 import { Overview } from "~/app/_components/manage-store/overview";
 
-const OverviewFragment = () => {
+interface OverviewFragmentProps {
+  storeId: string;
+}
+
+const OverviewFragment: React.FC<OverviewFragmentProps> = ({ storeId }) => {
   return (
     <TabsContent value="overview" className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -124,7 +128,7 @@ const OverviewFragment = () => {
             <CardDescription>You made 265 sales this month.</CardDescription>
           </CardHeader>
           <CardContent>
-            <RecentSales />
+            <RecentSales storeId={storeId} />
           </CardContent>
         </Card>
       </div>

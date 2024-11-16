@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "~/app/_components/client/shared/menu";
+import Menu from "~/app/_components/client/shared/menu";
 import { api } from "~/trpc/react";
 import Sidebar from "~/app/_components/client/shared/sidebar";
 import {
@@ -13,9 +13,10 @@ import MyVehicles from "~/app/_components/client/my-vehicles/my-vehicles";
 import CartunersExplore from "~/app/_components/client/cartuners-explore/cartuners-explore";
 
 const Dashboard = () => {
-  const name = api.clients.name.useQuery().data;
+  const name = api.clients.name.useQuery();
+  const avatar = api.clients.avatar.useQuery();
   const panels: Record<string, React.ReactNode> = {
-    "My vehicles": <MyVehicles name={name!} />,
+    "My vehicles": <MyVehicles name={name.data || ""} />,
     Cartuners: <CartunersExplore />,
   };
 
@@ -26,11 +27,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     setCurrentPanel(panels[selectedTab]);
-  }, [selectedTab]);
+  }, [selectedTab, name.data, avatar.data]);
 
   return (
     <main className="flex h-screen min-h-screen w-screen flex-col">
-      <Menu />
+      <Menu avatar={avatar.data} />
       <div className="border-t flex flex-row h-full relative">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel className="min-w-[250px]" defaultSize={10}>

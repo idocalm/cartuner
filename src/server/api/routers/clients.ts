@@ -11,6 +11,34 @@ export const clientsRouter = createTRPCRouter({
   name: publicProcedure.use(isAuthenticated).query(async ({ ctx }) => {
     return ctx.user?.name;
   }),
+  avatar: publicProcedure.use(isAuthenticated).query(async ({ ctx }) => {
+    const user = await ctx.db.clientUser.findUnique({
+      where: {
+        id: ctx.user!.id,
+      },
+    });
+
+    return user?.avatar;
+  }),
+  changeProfile: publicProcedure
+    .use(isAuthenticated)
+    .input(
+      z.object({
+        name: z.string().optional(),
+        img: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.clientUser.update({
+        where: {
+          id: ctx.user!.id,
+        },
+        data: {
+          name: input.name,
+          avatar: input.img,
+        },
+      });
+    }),
   vehicles: publicProcedure
     .use(isAuthenticated)
     .input(z.string())

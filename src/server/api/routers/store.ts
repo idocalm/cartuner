@@ -390,4 +390,162 @@ export const storeRouter = createTRPCRouter({
         },
       });
     }),
+
+  createSale: publicProcedure
+    .use(isAuthenticated)
+    .input(
+      z.object({
+        storeId: z.string(),
+        products: z.array(
+          z.object({
+            productId: z.string(),
+            quantity: z.number(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const store = await ctx.db.store.findFirst({
+        where: {
+          id: input.storeId,
+        },
+      });
+
+      if (!store) {
+        throw new Error("Store not found");
+      }
+
+      const products = await ctx.db.product.findMany({
+        where: {
+          id: {
+            in: input.products.map((product) => product.productId),
+          },
+        },
+      });
+
+      if (products.length !== input.products.length) {
+        throw new Error("Invalid product");
+      }
+
+      const order = await ctx.db.storeOrder.create({
+        data: {
+          storeId: input.storeId,
+          customerId: ctx.user!.id,
+          total: products.reduce((acc, product) => {
+            const productQuantity = input.products.find(
+              (p) => p.productId === product.id
+            )!.quantity;
+
+            return acc + product.price * productQuantity;
+          }, 0),
+          products: {
+            create: input.products.map((product) => ({
+              product: {
+                connect: {
+                  id: product.productId,
+                },
+              },
+              quantity: product.quantity,
+            })),
+          },
+        },
+      });
+
+      const storeOrder = await ctx.db.storesOrders.create({
+        data: {
+          storeId: input.storeId,
+          orderId: order.id,
+        },
+      });
+
+      return storeOrder;
+    }),
+
+  fetchSales: publicProcedure
+    .use(isAuthenticated)
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      // validate that the user is the owner of the store
+      const owner = await ctx.db.storeOwnerUser.findFirst({
+        where: {
+          id: ctx.user!.id,
+          stores: {
+            some: {
+              id: input,
+            },
+          },
+        },
+      });
+
+      if (!owner) {
+        throw new Error("Not the owner of this store");
+      }
+
+      // last month sales and no more than 10
+      /* each record has a storeId, orderId and an order object attached, so the createdAt is actually an attribute of the order
+       */
+
+      const storeOrders = await ctx.db.storesOrders.findMany({
+        where: {
+          storeId: input,
+          order: {
+            createdAt: {
+              gt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          },
+        },
+        orderBy: {
+          order: {
+            createdAt: "desc",
+          },
+        },
+        take: 10,
+      });
+      /* filter the results to only include the order object */
+
+      /* build a list of orders based on the results .orderId */
+
+      const orders = storeOrders.map((storeOrder) => storeOrder.orderId);
+
+      /* fetch the order objects */
+      const ordersDetails = await ctx.db.storeOrder.findMany({
+        where: {
+          id: {
+            in: orders,
+          },
+        },
+      });
+
+      const customers = await ctx.db.clientUser.findMany({
+        where: {
+          id: {
+            in: ordersDetails.map((order) => order.customerId),
+          },
+        },
+      });
+
+      const products = await ctx.db.ordersProducts.findMany({
+        where: {
+          orderId: {
+            in: orders,
+          },
+        },
+      });
+
+      const finalOrders = ordersDetails.map((order) => {
+        const orderProducts = products.filter(
+          (product) => product.orderId === order.id
+        );
+
+        return {
+          ...order,
+          customer: customers.find(
+            (customer) => customer.id === order.customerId
+          ),
+          products: orderProducts,
+        };
+      });
+
+      return finalOrders;
+    }),
 });

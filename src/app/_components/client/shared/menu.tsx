@@ -1,203 +1,215 @@
 "use client";
 
+import { AvatarFallback } from "@radix-ui/react-avatar";
 import Cookies from "js-cookie";
-import { Car } from "lucide-react";
+import Link from "next/link";
+import { Avatar, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from "~/components/ui/menubar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+import { ContextMenu, ContextMenuTrigger } from "~/components/ui/context-menu";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
+import { api } from "~/trpc/react";
+import { Checkbox } from "~/components/ui/checkbox";
 
-export function Menu() {
-  return (
-    <Menubar className="rounded-none border-b border-none px-2 lg:px-4">
-      <MenubarMenu>
-        <MenubarTrigger className="font-bold">
-          <div className="flex flex-row gap-2 justify-center items-center">
-            <Car color="#D0FD3E" size={24} />
-            cartuner
-          </div>
-        </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem>About Music</MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>
-            Preferences... <MenubarShortcut>⌘,</MenubarShortcut>
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>
-            Hide Music... <MenubarShortcut>⌘H</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem>
-            Hide Others... <MenubarShortcut>⇧⌘H</MenubarShortcut>
-          </MenubarItem>
-          <MenubarShortcut />
-          <MenubarItem>
-            Quit Music <MenubarShortcut>⌘Q</MenubarShortcut>
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger className="relative">File</MenubarTrigger>
-        <MenubarContent>
-          <MenubarSub>
-            <MenubarSubTrigger>New</MenubarSubTrigger>
-            <MenubarSubContent className="w-[230px]">
-              <MenubarItem>
-                Playlist <MenubarShortcut>⌘N</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem disabled>
-                Playlist from Selection <MenubarShortcut>⇧⌘N</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem>
-                Smart Playlist... <MenubarShortcut>⌥⌘N</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem>Playlist Folder</MenubarItem>
-              <MenubarItem disabled>Genius Playlist</MenubarItem>
-            </MenubarSubContent>
-          </MenubarSub>
-          <MenubarItem>
-            Open Stream URL... <MenubarShortcut>⌘U</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem>
-            Close Window <MenubarShortcut>⌘W</MenubarShortcut>
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarSub>
-            <MenubarSubTrigger>Library</MenubarSubTrigger>
-            <MenubarSubContent>
-              <MenubarItem>Update Cloud Library</MenubarItem>
-              <MenubarItem>Update Genius</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Organize Library...</MenubarItem>
-              <MenubarItem>Export Library...</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Import Playlist...</MenubarItem>
-              <MenubarItem disabled>Export Playlist...</MenubarItem>
-              <MenubarItem>Show Duplicate Items</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Get Album Artwork</MenubarItem>
-              <MenubarItem disabled>Get Track Names</MenubarItem>
-            </MenubarSubContent>
-          </MenubarSub>
-          <MenubarItem>
-            Import... <MenubarShortcut>⌘O</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem disabled>Burn Playlist to Disc...</MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>
-            Show in Finder <MenubarShortcut>⇧⌘R</MenubarShortcut>{" "}
-          </MenubarItem>
-          <MenubarItem>Convert</MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>Page Setup...</MenubarItem>
-          <MenubarItem disabled>
-            Print... <MenubarShortcut>⌘P</MenubarShortcut>
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>Edit</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem disabled>
-            Undo <MenubarShortcut>⌘Z</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem disabled>
-            Redo <MenubarShortcut>⇧⌘Z</MenubarShortcut>
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem disabled>
-            Cut <MenubarShortcut>⌘X</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem disabled>
-            Copy <MenubarShortcut>⌘C</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem disabled>
-            Paste <MenubarShortcut>⌘V</MenubarShortcut>
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>
-            Select All <MenubarShortcut>⌘A</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem disabled>
-            Deselect All <MenubarShortcut>⇧⌘A</MenubarShortcut>
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>
-            Smart Dictation...{" "}
-            <MenubarShortcut>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4"
-                viewBox="0 0 24 24"
-              >
-                <path d="m12 8-9.04 9.06a2.82 2.82 0 1 0 3.98 3.98L16 12" />
-                <circle cx="17" cy="7" r="5" />
-              </svg>
-            </MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem>
-            Emoji & Symbols{" "}
-            <MenubarShortcut>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4"
-                viewBox="0 0 24 24"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-            </MenubarShortcut>
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>View</MenubarTrigger>
-        <MenubarContent>
-          <MenubarCheckboxItem>Show Playing Next</MenubarCheckboxItem>
-          <MenubarCheckboxItem checked>Show Lyrics</MenubarCheckboxItem>
-          <MenubarSeparator />
-          <MenubarItem inset disabled>
-            Show Status Bar
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem inset>Hide Sidebar</MenubarItem>
-          <MenubarItem disabled inset>
-            Enter Full Screen
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger className="hidden md:block">Account</MenubarTrigger>
-        <MenubarContent forceMount>
-          <MenubarItem
-            onClick={() => {
-              Cookies.remove("auth-token");
-              window.location.href = "/";
-            }}
-          >
-            Logout
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
-  );
+interface MenuProps {
+  avatar?: string;
 }
+
+const Menu = ({ avatar }: MenuProps) => {
+  const [profileModalOpen, setProfileModalOpen] = useState<boolean>(false);
+  const [changeName, setChangeName] = useState<boolean>(false);
+  const [changeAvatar, setChangeAvatar] = useState<boolean>(false);
+  const [name, setName] = useState<string>("");
+  const [img, setImg] = useState<string>("https://website.com/myavatar.png");
+
+  const changeProfile = api.clients.changeProfile.useMutation({
+    onSuccess: () => {
+      setProfileModalOpen(false);
+      window.location.reload();
+    },
+  });
+
+  const saveProfile = () => {
+    // This is probably such a poor way to handle this, TODO
+
+    if (!changeName && !changeAvatar) {
+      return;
+    }
+
+    if (!changeName && changeAvatar) {
+      changeProfile.mutate({
+        img,
+      });
+      return;
+    }
+
+    if (changeName && !changeAvatar) {
+      changeProfile.mutate({
+        name,
+      });
+      return;
+    }
+
+    changeProfile.mutate({
+      name,
+      img,
+    });
+  };
+
+  return (
+    <div className="w-full flex flex-row justify-between items-center">
+      <Dialog open={profileModalOpen} onOpenChange={setProfileModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit profile</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="flex flex-row gap-4 items-center col-span-3">
+                <Checkbox
+                  checked={changeName}
+                  onClick={() => {
+                    setChangeName(!changeName);
+                  }}
+                />
+                <Label htmlFor="name" className="text-right">
+                  Name
+                </Label>
+
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  defaultValue="John Doe"
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <div className="flex flex-row gap-4 items-center col-span-3">
+                <Checkbox
+                  checked={changeAvatar}
+                  onClick={() => {
+                    setChangeAvatar(!changeAvatar);
+                  }}
+                />
+                <Label htmlFor="avatar" className="text-right">
+                  Avatar
+                </Label>
+                <Input
+                  id="img"
+                  value={img}
+                  onChange={(e) => setImg(e.target.value)}
+                  defaultValue="https://website.com/myavatar.png"
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="submit"
+              onClick={() => {
+                saveProfile();
+              }}
+            >
+              Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Menubar className="rounded-none border-b border-none px-2 lg:px-4">
+        <MenubarMenu>
+          <MenubarTrigger>
+            <Link href={"/"}>Home</Link>
+          </MenubarTrigger>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>Support</MenubarTrigger>
+          <MenubarContent>
+            <MenubarItem>Contact Us</MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <div className="flex p-4 items-center justify-center gap-4">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild></TooltipTrigger>
+            <TooltipContent>
+              <p>Add to library</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <Popover>
+          <PopoverTrigger>
+            <ContextMenu>
+              <ContextMenuTrigger
+                onClick={() => {
+                  setProfileModalOpen(true);
+                }}
+              >
+                <Avatar className="h-10 w-10 flex items-center justify-center border-2">
+                  <AvatarFallback>
+                    <span className="tracking-tighter text-sm">US</span>
+                  </AvatarFallback>
+                  <AvatarImage src={avatar} className="object-cover" />
+                </Avatar>
+              </ContextMenuTrigger>
+            </ContextMenu>
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="flex flex-col p-4 space-y-2">
+              <Button variant="outline">
+                <Link href={"/profile"}>Profile</Link>
+              </Button>
+              <Button variant="outline">
+                <Link href={"/settings"}>Settings</Link>
+              </Button>
+
+              <Button
+                onClick={() => {
+                  Cookies.remove("auth-token");
+                  window.location.reload();
+                }}
+              >
+                Logout
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
+  );
+};
+
+export default Menu;

@@ -21,6 +21,11 @@ const useCart = () => {
     }
   };
 
+  const clear = () => {
+    setContent([]);
+    localStorage.removeItem("cartuner_cart");
+  };
+
   const add = (product: Product) => {
     console.log(content);
     const existingProduct = content.find((p) => p.product.id === product.id);
@@ -60,6 +65,7 @@ const useCart = () => {
     remove,
     save,
     load,
+    clear,
   };
 };
 

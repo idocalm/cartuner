@@ -5,8 +5,9 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { ThemeProvider } from "./_components/theme-provider";
-import { Toaster } from "~/components/ui/sonner";
+import { SonnerToaster } from "~/components/ui/sonner";
 import { AuthProvider } from "./_components/auth-context";
+import { Toaster } from "~/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "cartuner",
@@ -17,7 +18,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html
+      lang="en"
+      className={`${GeistSans.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <TRPCReactProvider>
           <ThemeProvider
@@ -29,6 +34,7 @@ export default function RootLayout({
               <>
                 {children}
                 <Toaster />
+                <SonnerToaster />
               </>
             </AuthProvider>
           </ThemeProvider>

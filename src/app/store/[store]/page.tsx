@@ -150,6 +150,7 @@ const StorePage = () => {
   const ownerId = storeQuery.data?.ownerId;
   const currentUserId = api.auth.getId.useQuery();
   const products = api.store.getProducts.useQuery(store);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const updateName = api.store.updateName.useMutation({
     onSuccess: () => {
@@ -164,6 +165,12 @@ const StorePage = () => {
   });
 
   const router = useRouter();
+  const formattedTime = storeQuery.data?.establishedAt.toLocaleDateString();
+  const cart = useCart();
+
+  useEffect(() => {
+    cart.load();
+  }, []);
 
   if (storeQuery.error) {
     return <ErrorPanel message={storeQuery.error.message} />;
@@ -202,15 +209,6 @@ const StorePage = () => {
       </div>
     );
   }
-
-  const formattedTime = storeQuery.data?.establishedAt.toLocaleDateString();
-  const cart = useCart();
-
-  useEffect(() => {
-    cart.load();
-  }, []);
-
-  const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <div className="h-screen w-screen flex flex-col">

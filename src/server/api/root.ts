@@ -4,6 +4,7 @@ import { mechanicsRouter } from "~/server/api/routers/mechanics";
 import { storeRouter } from "~/server/api/routers/store";
 import { adminRouter } from "~/server/api/routers/admin";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { paymentRouter } from "./routers/payment";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   mechanics: mechanicsRouter,
   store: storeRouter,
   admin: adminRouter,
+  payment: paymentRouter,
 });
 
 // export type definition of API

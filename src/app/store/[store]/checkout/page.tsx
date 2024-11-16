@@ -1,11 +1,21 @@
 "use client";
 
+/* 
+  Important: The current paying process MIGHT LEAD to someone paying for a product, 
+  without the product being 100% written to the database. This is because the payment
+  is processed before the order is created. The solution: create the order first, then 
+  process the payment, if the payment fails, delete the order.
+
+  TODO
+*/
+
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { CartItem } from "~/app/_components/store/cart";
 import useCart from "~/hooks/use-cart";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+
 import {
   ResizableHandle,
   ResizablePanel,
@@ -26,7 +36,76 @@ import { useToast } from "~/hooks/use-toast";
 import { useAuth } from "~/app/_components/auth-context";
 import { TRPCClientErrorLike } from "@trpc/client";
 import { AppRouter } from "~/server/api/root";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import Confetti from "react-confetti";
+
+interface PayWithPaypalProps {
+  storeId: string;
+  total: number;
+  onSuccess: () => void;
+  onError: () => void;
+}
+
+const PayWithPaypal: React.FC<PayWithPaypalProps> = ({
+  storeId,
+  total,
+  onSuccess,
+  onError,
+}) => {
+  const pay = api.payment.initPayment.useMutation();
+  const capture = api.payment.capturePayment.useMutation();
+
+  return (
+    <PayPalScriptProvider
+      options={{
+        clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+        currency: "USD",
+        intent: "capture",
+      }}
+    >
+      <PayPalButtons
+        style={{
+          layout: "horizontal",
+          height: 40,
+          disableMaxWidth: false,
+          color: "gold",
+          shape: "rect",
+          label: "pay",
+        }}
+        createOrder={async (data, actions) => {
+          console.log(storeId, total);
+          const id = await pay.mutateAsync({
+            storeId,
+            total,
+            type: "paypal",
+          });
+
+          return id;
+        }}
+        onApprove={async (data, actions) => {
+          console.log(data);
+          const response = await capture.mutateAsync(data.orderID);
+          if (response) {
+            onSuccess();
+          }
+        }}
+        onError={(error) => {
+          onError();
+        }}
+      />
+    </PayPalScriptProvider>
+  );
+};
 
 const CheckoutAuthForm: React.FC = () => {
   const [type, setType] = React.useState<"signin" | "signup">("signin");
@@ -37,7 +116,6 @@ const CheckoutAuthForm: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { toast } = useToast();
   const { setToken } = useAuth();
-  const router = useRouter();
 
   const signup = api.auth.register.useMutation({
     onSuccess: ({ token, user }) => {
@@ -214,13 +292,53 @@ const CheckoutAuthForm: React.FC = () => {
 };
 
 const CheckoutPage = () => {
+  const { store } = useParams<{ store: string }>();
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { toast } = useToast();
+
   const cart = useCart();
-  const [signedIn] = api.auth.isConnected.useSuspenseQuery();
+  const signedIn = api.auth.isConnected.useQuery();
+  const router = useRouter();
+
+  const orderCreation = api.store.createSale.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Payment successful",
+        description: "Your payment has been processed successfully.",
+      });
+      setShowConfetti(true);
+      cart.clear();
+
+      setTimeout(() => {
+        setShowConfetti(false);
+        router.push("/screens/client/orders");
+      }, 4000);
+    },
+    onError: () => {
+      toast({
+        title: "Payment failed",
+        description:
+          "Something went wrong. Please try again. Your card has not been charged.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createOrder = (storeId: string, total: number) => {
+    orderCreation.mutate({
+      storeId,
+      products: cart.content.map((item) => ({
+        productId: item.product.id,
+        quantity: item.amount,
+      })),
+    });
+  };
+
   useEffect(() => {
     cart.load();
   }, []);
 
-  if (!signedIn) {
+  if (signedIn.data === false) {
     return (
       <div className="h-screen w-screen flex flex-col blur-sm">
         <Dialog open={true}>
@@ -236,39 +354,6 @@ const CheckoutPage = () => {
             <CheckoutAuthForm />
           </DialogContent>
         </Dialog>
-        <div className="flex flex-col h-screen w-screen pb-16 pt-10 px-16 gap-4">
-          <div className="flex flex-row justify-between w-full items-center z-10">
-            <h1 className="text-4xl font-semibold tracking-tighter">
-              Checkout
-            </h1>
-          </div>
-          <Separator />
-          <div className="border-t flex flex-row h-full relative">
-            <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel className="min-w-[250px]" defaultSize={40}>
-                <div className="flex flex-col gap-4 py-4 pr-4">
-                  <h2 className="text-lg font-semibold">Order Summary</h2>
-                  <Separator />
-                  {cart.content.map((item) => (
-                    <CartItem
-                      type="checkout"
-                      key={item.product.id}
-                      {...item}
-                      remove={(productId: string) => {
-                        cart.remove(productId);
-                      }}
-                    />
-                  ))}
-                </div>
-              </ResizablePanel>
-              <ResizableHandle withHandle />
-              <ResizablePanel
-                className="min-w-[50%]"
-                defaultSize={60}
-              ></ResizablePanel>
-            </ResizablePanelGroup>
-          </div>
-        </div>
       </div>
     );
   }
@@ -279,6 +364,11 @@ const CheckoutPage = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col">
+      <Confetti
+        width={window.innerWidth}
+        height={window.innerHeight}
+        run={showConfetti}
+      />
       <div className="flex flex-col h-screen w-screen pb-16 pt-10 px-16 gap-4">
         <div className="flex flex-row justify-between w-full items-center z-10">
           <h1 className="text-4xl font-semibold tracking-tighter">Checkout</h1>
@@ -320,6 +410,65 @@ const CheckoutPage = () => {
               <div className="flex flex-col gap-4 p-4">
                 <h2 className="text-lg font-semibold">Payment</h2>
                 <Separator />
+
+                <Tabs defaultValue="paypal" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="card">
+                      <p>Credit Card</p>
+                    </TabsTrigger>
+                    <TabsTrigger value="paypal">PayPal</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="paypal">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>
+                          Complete this payment using PayPal
+                        </CardTitle>
+                      </CardHeader>
+                      <CardFooter>
+                        <PayWithPaypal
+                          storeId={store}
+                          total={total}
+                          onSuccess={() => {
+                            createOrder(store, total);
+                          }}
+                          onError={() => {
+                            toast({
+                              title: "Payment failed",
+                              description:
+                                "Something went wrong. Please try again. Your card has not been charged.",
+                              variant: "destructive",
+                            });
+                          }}
+                        />
+                      </CardFooter>
+                    </Card>
+                  </TabsContent>
+                  <TabsContent value="password">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Password</CardTitle>
+                        <CardDescription>
+                          Change your password here. After saving, you'll be
+                          logged out.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="space-y-1">
+                          <Label htmlFor="current">Current password</Label>
+                          <Input id="current" type="password" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="new">New password</Label>
+                          <Input id="new" type="password" />
+                        </div>
+                      </CardContent>
+                      <CardFooter>
+                        <Button>Save password</Button>
+                      </CardFooter>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>

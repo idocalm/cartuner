@@ -16,10 +16,10 @@ const Home = () => {
         <div className="flex h-full w-full flex-col gap-4  px-10 pt-16 pb-50">
           <div className="flex flex-col gap-1">
             <h1 className="text-8xl font-extrabold tracking-tighter text-greenish">
-              Making sure your car is <br />
-              in good hands.
+              Ensuring your car gets the
+              <br /> expert care it deserves.
             </h1>
-            <h2 className="text-2xl font-bold text-hint tracking-tighter">
+            <h2 className="text-2xl font-semibold text-hint tracking-tighter">
               Connecting you with the best mechanics near you
             </h2>
           </div>
@@ -33,11 +33,10 @@ const Home = () => {
           </div>
           <br />
           <div className="flex flex-col">
-            <h1 className="text-4xl font-bold tracking-tighter">
+            <h1 className="text-4xl font-semibold tracking-tighter">
               Why do I need{" "}
               <span className="text-greenish text-italic">cartuner</span>?
             </h1>
-            <div className="w-20  h-[3px] bg-greenish my-2" />
             <p className="text-sm text-muted-foreground">
               We understand that finding a reliable mechanic can be a challenge.
               That&apos;s why we&apos;re here to connect you with the best

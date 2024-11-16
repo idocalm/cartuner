@@ -123,7 +123,11 @@ const InviteMechanicDialog: React.FC<{
   );
 };
 
-const OverviewPanel: React.FC = () => {
+interface OverviewPanelProps {
+  storeId: string;
+}
+
+const OverviewPanel: React.FC<OverviewPanelProps> = ({ storeId }) => {
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -140,7 +144,7 @@ const OverviewPanel: React.FC = () => {
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
-        <OverviewFragment />
+        <OverviewFragment storeId={storeId} />
       </Tabs>
     </div>
   );
@@ -372,7 +376,7 @@ const ManageStore: React.FC = () => {
     "overview" | "customers" | "products" | "settings",
     JSX.Element
   > = {
-    overview: <OverviewPanel />,
+    overview: <OverviewPanel storeId={store} />,
     customers: <></>,
     products: <ProductsPanel store={store} />,
     settings: <></>,
