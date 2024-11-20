@@ -1,9 +1,11 @@
+import { OrderStatus } from "@prisma/client";
 import { z } from "zod";
 import {
   createTRPCRouter,
   isAuthenticated,
   publicProcedure,
 } from "~/server/api/trpc";
+import crypto from "crypto";
 
 const periodScheme = z.enum(["year", "week", "month", "lifetime"]);
 
@@ -39,6 +41,86 @@ export const clientsRouter = createTRPCRouter({
         },
       });
     }),
+
+  getOrders: publicProcedure.use(isAuthenticated).query(async ({ ctx }) => {
+    // we need to find all orders made in the last 30 days that are not cancelled nor delivered, unless they are from the last 4 days.
+    // For each order, we need to find the products that were bought, and return a Product[] array, in addition to the order id, date, and status, and any notes on it.
+    // In addition we need to find the store that sold the product, and return the store name and email/phone number.
+
+    const orders = await ctx.db.storeOrder.findMany({
+      where: {
+        customerId: ctx.user!.id,
+        status: {
+          not: OrderStatus.CANCELLED || OrderStatus.DELIVERED,
+        },
+        createdAt: {
+          gt: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000),
+        },
+      },
+    });
+
+    const storeIds = orders.map((order) => order.storeId);
+    const stores = await ctx.db.store.findMany({
+      where: {
+        id: {
+          in: storeIds,
+        },
+      },
+      select: {
+        name: true,
+        phone: true,
+        id: true,
+      },
+    });
+
+    const storeOrders = await ctx.db.storeOrder.findMany({
+      where: {
+        id: {
+          in: orders.map((order) => order.id),
+        },
+      },
+      include: {
+        products: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    return orders.map((order) => {
+      const store = stores.find((store) => store.id === order.storeId);
+      const storeOrder = storeOrders.find(
+        (storeOrder) => storeOrder.id === order.id
+      );
+
+      const products = storeOrder?.products.map((entry) => {
+        return entry.product;
+      });
+
+      if (!store) {
+        return null;
+      }
+
+      return {
+        id: crypto
+          .createHash("sha256")
+          .update(order.id)
+          .digest("hex")
+          .substring(0, 8)
+          .toUpperCase(),
+        date: order.createdAt,
+        status: order.status,
+        notes: order.notes,
+        store: {
+          name: store.name,
+          phone: store.phone,
+        },
+        createdAt: order.createdAt,
+        products: products,
+      };
+    });
+  }),
   vehicles: publicProcedure
     .use(isAuthenticated)
     .input(z.string())

@@ -173,6 +173,13 @@ model StoresOrders {
   order StoreOrder @relation(fields: [orderId], references: [id])
 }
 
+enum OrderStatus {
+  PLACED
+  PROCESSED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
 
 model StoreOrder {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
@@ -183,6 +190,8 @@ model StoreOrder {
   total Float
   stores StoresOrders[]
   createdAt DateTime @default(now())
+  status OrderStatus @default(PLACED)
+  notes String @default("") 
 }
 
 model OwnerAlert {

@@ -6,6 +6,8 @@ import {
 } from "~/server/api/trpc";
 import { generateToken, TokenType } from "~/lib/jwt";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { OrderStatus } from "@prisma/client";
 
 export const storeRouter = createTRPCRouter({
   fetch: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -22,6 +24,85 @@ export const storeRouter = createTRPCRouter({
       },
     });
   }),
+  updateSaleNotes: publicProcedure
+    .use(isAuthenticated)
+    .input(
+      z.object({
+        orderId: z.string(),
+        notes: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const storeOrder = await ctx.db.storesOrders.findFirst({
+        where: {
+          orderId: input.orderId,
+          store: {
+            ownerId: ctx.user!.id,
+          },
+        },
+      });
+
+      if (!storeOrder) {
+        throw new Error("Invalid order");
+      }
+
+      const result = await ctx.db.storeOrder.update({
+        where: {
+          id: input.orderId,
+        },
+        data: {
+          notes: input.notes,
+        },
+      });
+
+      return {
+        notes: result.notes,
+        orderId: result.id,
+      };
+    }),
+
+  updateSaleStatus: publicProcedure
+    .use(isAuthenticated)
+    .input(
+      z.object({
+        orderId: z.string(),
+        status: z.enum([
+          OrderStatus.PLACED,
+          OrderStatus.PROCESSED,
+          OrderStatus.SHIPPED,
+          OrderStatus.CANCELLED,
+          OrderStatus.DELIVERED,
+        ]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const storeOrder = await ctx.db.storesOrders.findFirst({
+        where: {
+          orderId: input.orderId,
+          store: {
+            ownerId: ctx.user!.id,
+          },
+        },
+      });
+
+      if (!storeOrder) {
+        throw new Error("Invalid order");
+      }
+
+      const result = await ctx.db.storeOrder.update({
+        where: {
+          id: input.orderId,
+        },
+        data: {
+          status: input.status,
+        },
+      });
+
+      return {
+        newStatus: result.status,
+        orderId: result.id,
+      };
+    }),
   fetchByMechanic: publicProcedure
     .use(isAuthenticated)
     .query(async ({ ctx }) => {
@@ -543,6 +624,13 @@ export const storeRouter = createTRPCRouter({
             (customer) => customer.id === order.customerId
           ),
           products: orderProducts,
+          id: crypto
+            .createHash("sha256")
+            .update(order.id)
+            .digest("hex")
+            .substring(0, 8)
+            .toUpperCase(),
+          realId: order.id,
         };
       });
 

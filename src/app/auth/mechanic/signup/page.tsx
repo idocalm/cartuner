@@ -80,7 +80,7 @@ const PointProcess = () => {
       ),
     },
   ];
-  return <Timeline data={data} />;
+  return <Timeline data={data} gap="16" />;
 };
 
 interface CreationInterface {

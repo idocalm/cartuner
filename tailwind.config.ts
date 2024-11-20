@@ -11,6 +11,7 @@ export default {
       },
       colors: {
         background: "hsl(var(--background))",
+
         greenish: "#D0FD3E",
         hint: "#C9CACA",
         foreground: "hsl(var(--foreground))",
@@ -25,6 +26,14 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

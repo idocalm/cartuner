@@ -1,15 +1,5 @@
-import {
-  CarIcon,
-  Grid2X2Icon,
-  PaintBucket,
-  Search,
-  ShipWheelIcon,
-  SquareStackIcon,
-  Star,
-} from "lucide-react";
+import { Search } from "lucide-react";
 import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import categories from "~/data/tuners-categories";
 
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
@@ -19,69 +9,7 @@ import { Icons } from "~/components/ui/icons";
 import { useState } from "react";
 import { Store } from "@prisma/client";
 import { api } from "~/trpc/react";
-
-interface TunerCardInterface {
-  location: string;
-  stars: number;
-  name: string;
-  image: string;
-  id: string;
-}
-
-const TunerCard: React.FC<TunerCardInterface> = ({
-  location,
-  stars,
-  name,
-  image,
-  id,
-}) => {
-  return (
-    <Card className="h-48">
-      <div className="flex flex-col h-full">
-        <img className="h-24 w-full object-cover" src={image} />
-        <div className="flex flex-col h-full p-4">
-          <div className="flex flex-row items-center justify-between">
-            <a href={`/store/${id}`} className="text-lg font-bold">
-              {name}
-            </a>
-            <div className="flex flex-row items-center gap-1">
-              <Star size={16} />
-              <span>{stars}</span>
-            </div>
-          </div>
-          <div className="text-sm text-gray-500">{location}</div>
-        </div>
-      </div>
-    </Card>
-  );
-};
-
-const SearchResults: React.FC<{ stores: Store[] }> = ({ stores }) => {
-  if (stores.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-20">
-        <div className="text-lg text-gray-500 font-bold tracking-tighter">
-          No results found
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-3 gap-4">
-      {stores.map((store, index) => (
-        <TunerCard
-          key={index}
-          location={store.address}
-          stars={5}
-          name={store.name}
-          image={store.image}
-          id={store.id}
-        />
-      ))}
-    </div>
-  );
-};
+import SearchResults from "./search-results";
 
 const CartunersExplore = () => {
   const [isSearching, setIsSearching] = useState(false);

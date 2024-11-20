@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import MyVehicles from "~/app/_components/client/my-vehicles/my-vehicles";
 import CartunersExplore from "~/app/_components/client/cartuners-explore/cartuners-explore";
+import OrderHistory from "~/app/_components/client/order-history/order-history";
 
 const Dashboard = () => {
   const name = api.clients.name.useQuery();
@@ -18,6 +19,7 @@ const Dashboard = () => {
   const panels: Record<string, React.ReactNode> = {
     "My vehicles": <MyVehicles name={name.data || ""} />,
     Cartuners: <CartunersExplore />,
+    "Order history": <OrderHistory />,
   };
 
   const [selectedTab, setSelectedTab] = useState<string>("My vehicles");
@@ -66,6 +68,15 @@ const Dashboard = () => {
                     {
                       icon: "Map",
                       name: "Cartuners",
+                    },
+                  ],
+                },
+                {
+                  name: "Transactions",
+                  tabs: [
+                    {
+                      icon: "CreditCard",
+                      name: "Order history",
                     },
                   ],
                 },
