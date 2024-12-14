@@ -8,12 +8,25 @@ import {
 import { TabsContent } from "~/components/ui/tabs";
 import RecentSales from "~/app/_components/manage-store/recent-sales";
 import { Overview } from "~/app/_components/manage-store/overview";
+import { api } from "~/trpc/react";
+import Loading from "../../client/shared/loading";
+import { Sale } from "~/app/types";
 
 interface OverviewFragmentProps {
   storeId: string;
 }
 
 const OverviewFragment: React.FC<OverviewFragmentProps> = ({ storeId }) => {
+  const sales = api.store.fetchSales.useQuery(storeId);
+
+  if (sales.isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Loading title="Loading sales" message="Sit tight" />
+      </div>
+    );
+  }
+
   return (
     <TabsContent value="overview" className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -67,7 +80,7 @@ const OverviewFragment: React.FC<OverviewFragmentProps> = ({ storeId }) => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sales</CardTitle>
+            <CardTitle className="text-sm font-medium">Orders</CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -83,10 +96,8 @@ const OverviewFragment: React.FC<OverviewFragmentProps> = ({ storeId }) => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
+            <div className="text-2xl font-bold">+{sales.data?.length}</div>
+            <p className="text-xs text-muted-foreground">from last month</p>
           </CardContent>
         </Card>
         <Card>
@@ -128,7 +139,7 @@ const OverviewFragment: React.FC<OverviewFragmentProps> = ({ storeId }) => {
             <CardDescription>You made 265 sales this month.</CardDescription>
           </CardHeader>
           <CardContent>
-            <RecentSales storeId={storeId} />
+            <RecentSales sales={sales.data as Sale[]} />
           </CardContent>
         </Card>
       </div>

@@ -12,14 +12,15 @@ import { useEffect, useState } from "react";
 import MyVehicles from "~/app/_components/client/my-vehicles/my-vehicles";
 import CartunersExplore from "~/app/_components/client/cartuners-explore/cartuners-explore";
 import OrderHistory from "~/app/_components/client/order-history/order-history";
+import Incidents from "~/app/_components/client/incidents/incidents";
 
 const Dashboard = () => {
-  const name = api.clients.name.useQuery();
   const avatar = api.clients.avatar.useQuery();
   const panels: Record<string, React.ReactNode> = {
-    "My vehicles": <MyVehicles name={name.data || ""} />,
+    "My vehicles": <MyVehicles />,
     Cartuners: <CartunersExplore />,
     "Order history": <OrderHistory />,
+    Incidents: <Incidents />,
   };
 
   const [selectedTab, setSelectedTab] = useState<string>("My vehicles");
@@ -29,7 +30,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     setCurrentPanel(panels[selectedTab]);
-  }, [selectedTab, name.data, avatar.data]);
+  }, [selectedTab, avatar.data]);
 
   return (
     <main className="flex h-screen min-h-screen w-screen flex-col">

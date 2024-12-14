@@ -71,7 +71,6 @@ model Store {
   mechanics MechanicsStores[]
   stars Int @default(0)
   reviews Review[] 
-  incidents Incident[]
   products Product[]
   orders StoresOrders[]
 }
@@ -99,34 +98,23 @@ model Vehicle {
   createdAt DateTime @default(now())
   Incident Incident[]
   notes String @default("")
-  Repair Repair[]
 }
 
 model Incident {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
-  title String
   description String
+  date DateTime
+  location String
+  photos String[]
+  hitbox Float[]
   vehicle Vehicle @relation(fields: [id], references: [id])
   vehicleId String @db.ObjectId
   status String @default("Pending")
   ownerId String @db.ObjectId
   createdAt DateTime @default(now())
-  store Store @relation(fields: [id], references: [id])
-  Repair Repair[]
+
 }
 
-model Repair {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  title String
-  description String
-  cost  Float
-  incidentId String @db.ObjectId
-  ownerId String @db.ObjectId
-  vehicleId String @db.ObjectId
-  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
-  incident Incident @relation(fields: [incidentId], references: [id])
-  createdAt DateTime @default(now())
-}
 
 model AdminUser {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
@@ -203,3 +191,4 @@ model OwnerAlert {
   owner StoreOwnerUser @relation(fields: [ownerId], references: [id])
   ownerId String @db.ObjectId
 }
+

@@ -8,9 +8,12 @@ import React, {
 } from "react";
 
 import Cookies from "js-cookie";
+import { Transport } from "node_modules/engine.io-client/build/esm/transport";
+import { emitter } from "~/lib/emitter";
 
 interface AuthContextType {
   token: string | null;
+  socketId: string | undefined;
   setToken: (token: string | null) => void;
 }
 
@@ -20,12 +23,54 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [token, setTokenState] = useState<string | null>(null);
+  const [socketId, setSocketId] = useState<string | undefined>(undefined);
+  const [socketConnected, setSocketConnected] = useState<boolean>(false);
+  const [socketTransport, setSocketTransport] = useState<string | null>(null);
 
+  /*
+  const onSocketConnected = () => {
+    console.error("Socket connected");
+    setSocketConnected(true);
+    setSocketId(socket.id);
+    setSocketTransport(socket.io.engine.transport.name);
+
+    socket.on("newAlert", (alertData) => {
+      console.log("New alert:", alertData);
+    });
+
+    socket.io.engine.on("upgrade", (transport: Transport) => {
+      setSocketTransport(transport.name);
+    });
+  };
+
+  const onSocketDisconnected = () => {
+    console.error("Socket disconnected");
+    setSocketConnected(false);
+    setSocketId(undefined);
+    setSocketTransport(null);
+  };
+
+  emitter.on("initSocket", () => {
+    socket.connect();
+  });
+
+  socket.on("connect", onSocketConnected);
+  socket.on("disconnect", onSocketDisconnected);
+*/
   useEffect(() => {
     const savedToken = Cookies.get("auth-token");
     if (savedToken) {
       setTokenState(savedToken);
     }
+
+    /*
+
+    return () => {
+      socket.off("connect", onSocketConnected);
+      socket.off("disconnect", onSocketDisconnected);
+    };
+
+    */
   }, []);
 
   /* TODO: Why is this here? If we're setting the token in the cookie, why do we need to set it in local storage? */
@@ -39,7 +84,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ token, setToken }}>
+    <AuthContext.Provider value={{ token, setToken, socketId }}>
       {children}
     </AuthContext.Provider>
   );

@@ -13,6 +13,13 @@ export const clientsRouter = createTRPCRouter({
   name: publicProcedure.use(isAuthenticated).query(async ({ ctx }) => {
     return ctx.user?.name;
   }),
+  loadIncidents: publicProcedure.use(isAuthenticated).query(async ({ ctx }) => {
+    return ctx.db.incident.findMany({
+      where: {
+        ownerId: ctx.user!.id,
+      },
+    });
+  }),
   avatar: publicProcedure.use(isAuthenticated).query(async ({ ctx }) => {
     const user = await ctx.db.clientUser.findUnique({
       where: {
@@ -117,6 +124,7 @@ export const clientsRouter = createTRPCRouter({
           phone: store.phone,
         },
         createdAt: order.createdAt,
+        realId: order.id,
         products: products,
       };
     });
@@ -186,6 +194,39 @@ export const clientsRouter = createTRPCRouter({
       return ctx.db.vehicle.create({
         data: {
           ...input,
+          ownerId: ctx.user!.id,
+        },
+      });
+    }),
+
+  createIncident: publicProcedure
+    .use(isAuthenticated)
+    .input(
+      z.object({
+        vehicleId: z.string(),
+        description: z.string(),
+        date: z.date(),
+        location: z.string(),
+        photos: z.array(z.string()),
+        hitbox: z.array(z.number()), //.length(4),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.incident.create({
+        data: {
+          ...input,
+          ownerId: ctx.user!.id,
+        },
+      });
+    }),
+
+  loadIncident: publicProcedure
+    .use(isAuthenticated)
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      return ctx.db.incident.findFirst({
+        where: {
+          id: input,
           ownerId: ctx.user!.id,
         },
       });
@@ -267,15 +308,7 @@ export const clientsRouter = createTRPCRouter({
           break;
       }
 
-      return ctx.db.repair.findMany({
-        where: {
-          vehicleId: input.vehicleId,
-          ownerId: ctx.user!.id,
-          createdAt: {
-            gte: date,
-          },
-        },
-      });
+      return []; // TODO: implement this
     }),
 
   updateVehicleNotes: publicProcedure

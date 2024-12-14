@@ -636,4 +636,57 @@ export const storeRouter = createTRPCRouter({
 
       return finalOrders;
     }),
+  deleteOrder: publicProcedure
+    .use(isAuthenticated)
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      console.log(input);
+
+      const storeOrder = await ctx.db.storesOrders.findFirst({
+        where: {
+          orderId: input,
+          order: {
+            customerId: ctx.user!.id,
+          },
+        },
+      });
+
+      if (!storeOrder) {
+        throw new Error("Invalid order");
+      }
+
+      const order = await ctx.db.storeOrder.findFirst({
+        where: {
+          id: input,
+        },
+      });
+
+      if (!order) {
+        throw new Error("Order not found");
+      }
+
+      if (order.status !== OrderStatus.PLACED) {
+        throw new Error("Order cannot be deleted");
+      }
+
+      await ctx.db.ordersProducts.deleteMany({
+        where: {
+          orderId: input,
+        },
+      });
+
+      await ctx.db.storesOrders.delete({
+        where: {
+          id: storeOrder.id,
+        },
+      });
+
+      await ctx.db.storeOrder.delete({
+        where: {
+          id: input,
+        },
+      });
+
+      return true;
+    }),
 });

@@ -3,6 +3,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
 import { generateToken, TokenType } from "~/lib/jwt";
+import googleClient from "~/utils/google-auth";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
@@ -92,6 +93,24 @@ export const authRouter = createTRPCRouter({
         token,
         user,
       };
+    }),
+  google: publicProcedure
+    .input(
+      z.object({
+        code: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { tokens } = await googleClient.getToken(input.code);
+      const user = await googleClient.verifyIdToken({
+        idToken: tokens.id_token!,
+        audience: process.env.GOOGLE_CLIENT_ID!,
+      });
+
+      const { name, email } = user.getPayload()!;
+      const existingUser = await ctx.db.clientUser.findUnique({
+        where: { email },
+      });
     }),
   getId: publicProcedure.query(async ({ ctx }) => {
     return ctx.user?.id;

@@ -9,28 +9,17 @@ import ChangeOrderStatus from "./order-status-combobox";
 import ChangeOrderNotes from "./order-notes-change";
 import { OrderStatus } from "@prisma/client";
 import { useState } from "react";
+import ErrorPanel from "../client/shared/error";
+import { Sale } from "~/app/types";
 
 interface RecentSalesProps {
-  storeId: string;
+  sales: Sale[];
 }
 
 const SaleCard: React.FC<{
-  sale: {
-    id: string;
-    realId: string;
-    status: OrderStatus;
-    customer?: {
-      name: string;
-      email: string;
-      avatar: string;
-    };
-    total: number;
-    notes: string;
-  };
-
+  sale: Sale;
   updateSaleStatus: ReturnType<typeof api.store.updateSaleStatus.useMutation>;
   updateSaleNotes: ReturnType<typeof api.store.updateSaleNotes.useMutation>;
-
   isUpdating: boolean;
 }> = ({ sale, updateSaleStatus, updateSaleNotes, isUpdating }) => {
   let variant: "default" | "success" | "warning" = "default";
@@ -98,9 +87,7 @@ const SaleCard: React.FC<{
   );
 };
 
-const RecentSales: React.FC<RecentSalesProps> = ({ storeId }) => {
-  const sales = api.store.fetchSales.useQuery(storeId);
-
+const RecentSales: React.FC<RecentSalesProps> = ({ sales }) => {
   const [updatingList, setUpdatingList] = useState<string[]>([]);
 
   const updateSaleStatus = api.store.updateSaleStatus.useMutation({
@@ -109,7 +96,7 @@ const RecentSales: React.FC<RecentSalesProps> = ({ storeId }) => {
     },
     onSuccess: ({ newStatus, orderId }) => {
       // update the status of the sale in the sales list
-      sales.data?.forEach((sale) => {
+      sales.forEach((sale) => {
         if (sale.realId === orderId) {
           sale.status = newStatus;
         }
@@ -124,7 +111,7 @@ const RecentSales: React.FC<RecentSalesProps> = ({ storeId }) => {
     },
     onSuccess: ({ notes, orderId }) => {
       // update the notes of the sale in the sales list
-      sales.data?.forEach((sale) => {
+      sales.forEach((sale) => {
         if (sale.realId === orderId) {
           sale.notes = notes;
         }
@@ -133,34 +120,11 @@ const RecentSales: React.FC<RecentSalesProps> = ({ storeId }) => {
     },
   });
 
-  if (sales.isLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="flex flex-col gap-3">
-          <Skeleton className="h-9 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-        </div>
-        <div className="flex flex-col gap-3">
-          <Skeleton className="h-9 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-        </div>
-        <div className="flex flex-col gap-3">
-          <Skeleton className="h-9 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-        </div>
-      </div>
-    );
+  if (!sales) {
+    return <ErrorPanel message="Failed to fetch recent sales" />;
   }
 
-  if (!sales.data) {
-    return (
-      <div className="text-muted-foreground text-sm">
-        Error loading recent sales
-      </div>
-    );
-  }
-
-  if (sales.data.length === 0) {
+  if (sales.length === 0) {
     return (
       <div className="text-muted-foreground text-md font-bold tracking-tighter">
         No recent sales
@@ -170,7 +134,7 @@ const RecentSales: React.FC<RecentSalesProps> = ({ storeId }) => {
 
   return (
     <div className="space-y-8">
-      {sales.data.map((sale) => {
+      {sales.map((sale) => {
         return (
           <SaleCard
             key={sale.id}

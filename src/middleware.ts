@@ -125,16 +125,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (request.nextUrl.pathname.startsWith("/auth/mechanic/")) {
-    if (token) {
-      const decoded = (await verifyToken(token.value)) as { type: string };
-      if (decoded) {
-        url.pathname = redirectToDashboard(decoded.type);
-        return NextResponse.redirect(url.toString());
-      }
-    }
-  }
-
   if (request.nextUrl.pathname.startsWith("/auth/admin")) {
     console.log("Admin auth route");
     if (token) {

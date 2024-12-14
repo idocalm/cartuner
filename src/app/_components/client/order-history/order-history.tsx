@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -19,6 +19,19 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { Trash } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import { toast } from "~/hooks/use-toast";
 const OrderStatusPanel: React.FC<{
   status: OrderStatus;
 }> = ({ status }) => {
@@ -115,7 +128,7 @@ interface OrderCardProps {
   status: OrderStatus;
   notes: string;
   phoneNumber: string;
-  onTrackOrder: () => void;
+  deleteOrder: () => void;
 }
 
 const OrderCard: React.FC<OrderCardProps> = ({
@@ -125,22 +138,67 @@ const OrderCard: React.FC<OrderCardProps> = ({
   notes,
   status,
   phoneNumber,
-  onTrackOrder,
+  deleteOrder,
 }) => {
+  const [deleteOrderOpen, setDeleteOrderOpen] = useState(false);
   return (
     <Card>
       <CardHeader>
         <CardTitle>
           <div className="w-full flex flex-row justify-between items-center">
             <p>Order #{orderId}</p>
+            <AlertDialog
+              open={deleteOrderOpen}
+              onOpenChange={setDeleteOrderOpen}
+            >
+              <AlertDialogTrigger asChild>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        onClick={() => setDeleteOrderOpen(true)}
+                        variant="destructive"
+                        disabled={status !== OrderStatus.PLACED}
+                      >
+                        <Trash size={24} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {status !== OrderStatus.PLACED
+                        ? "You can't delete an order that has been already processed."
+                        : "Delete order"}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete order</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. Please make sure you check the
+                    refund policy with the seller before proceeding.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      deleteOrder();
+                    }}
+                  >
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardTitle>
         <CardDescription>
           Order placed on {orderDate.toDateString()}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center flex-col">
-        <div className="flex flex-row items-center justify-between min-h-40 h-72 w-full">
+      <CardContent className="flex flex-col">
+        <div className="flex flex-row w-full pb-8">
           <div className="flex flex-col gap-1 h-full w-1/2">
             <OrderStatusPanel status={status} />
           </div>
@@ -175,12 +233,47 @@ const OrderCard: React.FC<OrderCardProps> = ({
 const OrderHistory: React.FC = () => {
   const orders = api.clients.getOrders.useQuery();
 
+  const removeOrder = api.store.deleteOrder.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Order deleted",
+        description: "The order has been successfully deleted",
+      });
+      orders.refetch();
+    },
+  });
+
   if (orders.isLoading) {
     return <Loading title="Loading orders..." message="Sit tight" />;
   }
 
   if (orders.error || !orders.data) {
     return <ErrorPanel message="Failed to fetch orders" />;
+  }
+
+  if (orders.data.length === 0) {
+    return (
+      <div className="flex flex-col h-full w-full">
+        <div className="col-span-3 lg:col-span-4 lg:border-l">
+          <div className="h-full px-4 py-6 lg:px-8 flex flex-col gap-2">
+            <div className="flex flex-col gap-1 mb-4">
+              <h1 className="text-4xl font-bold tracking-tight ">
+                Recent orders
+              </h1>
+              <p className="text-muted-foreground">
+                Here you can see all your recent orders, and their status.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center justify-center w-full h-full">
+              <p className="text-md text-bold text-muted-foreground">
+                You don't have any orders yet
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -195,6 +288,7 @@ const OrderHistory: React.FC = () => {
               Here you can see all your recent orders, and their status.
             </p>
           </div>
+
           <div className="grid grid-cols-3 gap-4">
             {orders.data.map((order) => (
               <OrderCard
@@ -204,8 +298,10 @@ const OrderHistory: React.FC = () => {
                 notes={order?.notes ?? ""}
                 products={order?.products ?? []}
                 status={order?.status ?? OrderStatus.PLACED}
-                onTrackOrder={() => {}}
                 phoneNumber={order?.store?.phone ?? ""}
+                deleteOrder={() => {
+                  removeOrder.mutate(order?.realId ?? "");
+                }}
               />
             ))}
           </div>

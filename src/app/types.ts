@@ -1,3 +1,5 @@
+import { OrderStatus } from "@prisma/client";
+
 export interface Vehicle {
   id: string;
   brand: string;
@@ -7,5 +9,18 @@ export interface Vehicle {
   name: string;
   type: string;
   vin: string;
+  notes: string;
+}
+
+export interface Sale {
+  id: string;
+  realId: string;
+  status: OrderStatus;
+  customer?: {
+    name: string;
+    email: string;
+    avatar: string;
+  };
+  total: number;
   notes: string;
 }

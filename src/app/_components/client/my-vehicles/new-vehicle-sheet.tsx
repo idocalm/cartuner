@@ -14,7 +14,6 @@ import { Icons } from "~/components/ui/icons";
 import { useToast } from "~/hooks/use-toast";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
-import { AlertDialogAction } from "~/components/ui/alert-dialog";
 
 const NewVehicleSheet: React.FC = () => {
   const [brandOpen, setBrandOpen] = useState(false);
@@ -72,7 +71,7 @@ const NewVehicleSheet: React.FC = () => {
       type: "all", // TODO: Implement type selection
       notes: "",
     });
-    setLoading(false);
+    setLoading(false); // TODO: This is unnecessary
   };
 
   return (

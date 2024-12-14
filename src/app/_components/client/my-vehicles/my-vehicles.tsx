@@ -65,7 +65,9 @@ const VehicleShowing: React.FC<{
   );
 };
 
-const MyVehicles: React.FC<{ name: string }> = ({ name }) => {
+const MyVehicles: React.FC = () => {
+  const name = api.clients.name.useQuery();
+
   const [viewing, setViewing] = useState<boolean>(false);
   const [viewVehicle, setViewVehicle] = useState<string>("");
 
@@ -83,7 +85,7 @@ const MyVehicles: React.FC<{ name: string }> = ({ name }) => {
       <div className="col-span-3 lg:col-span-4 lg:border-l">
         <div className="h-full px-4 py-6 lg:px-8 flex flex-col gap-3">
           <h1 className="text-4xl font-bold tracking-tight">
-            Welcome back, {name}
+            Welcome back, {name.data}
           </h1>
           <Tabs defaultValue="all" className="h-full space-y-6">
             <div className="space-between flex items-center">

@@ -311,7 +311,7 @@ const CheckoutPage = () => {
 
       setTimeout(() => {
         setShowConfetti(false);
-        router.push("/screens/client/orders");
+        router.push("/screens/client/dashboard");
       }, 4000);
     },
     onError: () => {
