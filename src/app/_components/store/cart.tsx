@@ -31,7 +31,11 @@ export const CartItem: React.FC<CartItemProps> = ({
         <CardHeader>
           <div className="flex flex-row justify-between">
             <div className="flex flex-row items-center gap-4">
-              <img className="h-20 w-20 object-cover rounded-sm" src={image} />
+              <img
+                className="h-20 w-20 object-cover rounded-sm"
+                src={image}
+                alt="image"
+              />
               <div className="flex flex-col">
                 <h2 className="text-lg font-semibold">{name}</h2>
                 <p className="text-sm text-muted-foreground">{description}</p>

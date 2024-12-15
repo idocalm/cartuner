@@ -7,7 +7,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/components/ui/sheet";
-import { models } from "~/data/vehicle-data";
+import type { models } from "~/data/vehicle-data";
 import { useState } from "react";
 import NewVehicleBody from "./new-vehicle-body";
 import { Icons } from "~/components/ui/icons";
@@ -47,7 +47,7 @@ const NewVehicleSheet: React.FC = () => {
         duration: 2000,
       });
     },
-    onError: (error) => {
+    onError: () => {
       setLoading(false);
 
       toast({

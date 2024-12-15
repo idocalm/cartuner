@@ -9,7 +9,6 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogCancel,
-  AlertDialogAction,
 } from "~/components/ui/alert-dialog";
 import {
   AlertDialogHeader,
@@ -20,10 +19,11 @@ import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Vehicle } from "@prisma/client";
 
-// TODO: Implement this interface in the VehicleCard
+/* TODO: Implement this interface in the VehicleCard
 interface VehicleCardProps extends Vehicle {
   showDetails: (id: string) => void;
 }
+*/
 
 const VehicleCard: React.FC<{
   vehicle: {

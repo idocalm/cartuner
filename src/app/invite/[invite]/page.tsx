@@ -38,7 +38,8 @@ const Invite = () => {
     <div className="flex flex-col items-center justify-center h-screen w-screen">
       <Confetti width={window.innerWidth} height={window.innerHeight} />
       <h1 className="text-6xl font-black tracking-tighter text-center">
-        You've been invited to join "{inviteValidation.data?.store?.name}"
+        You&apos;ve been invited to join &quot;
+        {inviteValidation.data?.store?.name}&quot;
       </h1>
       <p className="text-center text-muted-foreground">
         By joining this store, you will be able to accept orders and manage

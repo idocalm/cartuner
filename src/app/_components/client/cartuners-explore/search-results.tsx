@@ -1,4 +1,4 @@
-import { Store } from "@prisma/client";
+import type { Store } from "@prisma/client";
 import TunerCard from "./tuner-card";
 
 const SearchResults: React.FC<{ stores: Store[] }> = ({ stores }) => {

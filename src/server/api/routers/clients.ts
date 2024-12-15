@@ -290,7 +290,7 @@ export const clientsRouter = createTRPCRouter({
   loadVehicleRepairs: publicProcedure
     .use(isAuthenticated)
     .input(z.object({ vehicleId: z.string(), period: periodScheme }))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       const date = new Date();
       date.setHours(0, 0, 0, 0);
       switch (input.period) {

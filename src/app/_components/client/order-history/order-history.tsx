@@ -9,7 +9,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { Timeline } from "../../timeline";
 import { Button } from "~/components/ui/button";
-import { OrderStatus, Product } from "@prisma/client";
+import { OrderStatus, type Product } from "@prisma/client";
 import { api } from "~/trpc/react";
 import ErrorPanel from "../shared/error";
 import Loading from "../shared/loading";
@@ -267,7 +267,7 @@ const OrderHistory: React.FC = () => {
 
             <div className="flex flex-col items-center justify-center w-full h-full">
               <p className="text-md text-bold text-muted-foreground">
-                You don't have any orders yet
+                You don&apos;t have any orders yet
               </p>
             </div>
           </div>

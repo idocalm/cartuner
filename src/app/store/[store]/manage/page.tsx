@@ -23,7 +23,7 @@ import {
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import Loading from "~/app/_components/client/shared/loading";
-import { type MechanicUser, StoreOwnerUser } from "@prisma/client";
+import type { MechanicUser, StoreOwnerUser } from "@prisma/client";
 import ErrorPanel from "~/app/_components/client/shared/error";
 import {
   Popover,
@@ -39,7 +39,7 @@ import {
   CommandList,
 } from "~/components/ui/command";
 import { Icons } from "~/components/ui/icons";
-import { Check, ChevronsUpDown, Plus, Trash } from "lucide-react";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import ProductsView from "~/app/_components/manage-store/products-view";
 import { Label } from "~/components/ui/label";
@@ -428,7 +428,7 @@ const ManageStore: React.FC = () => {
           />
           <div className="ml-auto flex items-center space-x-4">
             <UserNav
-              owner={owner.data as StoreOwnerUser}
+              owner={owner.data! as StoreOwnerUser}
               showManageMechanics={() => showMechanicDialog()}
             />
             <InviteMechanicDialog

@@ -1,4 +1,4 @@
-import { OrderStatus } from "@prisma/client";
+import type { OrderStatus } from "@prisma/client";
 
 export interface Vehicle {
   id: string;

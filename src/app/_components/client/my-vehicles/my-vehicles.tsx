@@ -9,7 +9,7 @@ import { Terminal } from "lucide-react";
 
 import { useState } from "react";
 import VehicleView from "../vehicle-view/vehicle-view";
-import { Vehicle } from "~/app/types";
+import type { Vehicle } from "~/app/types";
 import NewVehicleSheet from "./new-vehicle-sheet";
 import VehicleCard from "./vehicle-card";
 

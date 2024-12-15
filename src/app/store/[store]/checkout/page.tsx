@@ -34,8 +34,8 @@ import { Input } from "~/components/ui/input";
 import { Icons } from "~/components/ui/icons";
 import { useToast } from "~/hooks/use-toast";
 import { useAuth } from "~/app/_components/auth-context";
-import { TRPCClientErrorLike } from "@trpc/client";
-import { AppRouter } from "~/server/api/root";
+import type { TRPCClientErrorLike } from "@trpc/client";
+import type { AppRouter } from "~/server/api/root";
 import { useParams, useRouter } from "next/navigation";
 import {
   Card,
@@ -82,7 +82,7 @@ const PayWithPaypal: React.FC<PayWithPaypalProps> = ({
           shape: "rect",
           label: "pay",
         }}
-        createOrder={async (data, actions) => {
+        createOrder={async () => {
           console.log(storeId, total);
           const id = await pay.mutateAsync({
             storeId,
@@ -92,14 +92,14 @@ const PayWithPaypal: React.FC<PayWithPaypalProps> = ({
 
           return id;
         }}
-        onApprove={async (data, actions) => {
+        onApprove={async (data) => {
           console.log(data);
           const response = await capture.mutateAsync(data.orderID);
           if (response) {
             onSuccess();
           }
         }}
-        onError={(error) => {
+        onError={() => {
           onError();
         }}
       />
@@ -324,7 +324,7 @@ const CheckoutPage = () => {
     },
   });
 
-  const createOrder = (storeId: string, total: number) => {
+  const createOrder = (storeId: string) => {
     orderCreation.mutate({
       storeId,
       products: cart.content.map((item) => ({
@@ -344,7 +344,7 @@ const CheckoutPage = () => {
         <Dialog open={true}>
           <DialogContent className="sm:max-w-[425px]" closable={false}>
             <DialogHeader>
-              <DialogTitle>You're not signed in</DialogTitle>
+              <DialogTitle>You&apos;re not signed in</DialogTitle>
               <DialogDescription>
                 To complete your purchase, please sign in or create an account
                 below.
@@ -430,7 +430,7 @@ const CheckoutPage = () => {
                           storeId={store}
                           total={total}
                           onSuccess={() => {
-                            createOrder(store, total);
+                            createOrder(store);
                           }}
                           onError={() => {
                             toast({
@@ -449,8 +449,8 @@ const CheckoutPage = () => {
                       <CardHeader>
                         <CardTitle>Password</CardTitle>
                         <CardDescription>
-                          Change your password here. After saving, you'll be
-                          logged out.
+                          Change your password here. After saving, you&apos;ll
+                          be logged out.
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-2">

@@ -21,8 +21,6 @@ const ChangeOrderStatus: React.FC<{
   currentStatus: OrderStatus;
   setStatus: (status: OrderStatus) => void;
 }> = ({ currentStatus, setStatus }) => {
-  const statusDisplay =
-    status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   const [open, setOpen] = useState(false);
 
   const statuses = Object.values(OrderStatus).map((status) => ({
@@ -47,7 +45,7 @@ const ChangeOrderStatus: React.FC<{
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder="Select status" />
           <CommandList>
             <CommandEmpty>No framework found.</CommandEmpty>
             <CommandGroup>

@@ -20,7 +20,7 @@ const TunerCard: React.FC<TunerCardInterface> = ({
   return (
     <Card className="h-48">
       <div className="flex flex-col h-full">
-        <img className="h-24 w-full object-cover" src={image} />
+        <img className="h-24 w-full object-cover" src={image} alt="image" />
         <div className="flex flex-col h-full p-4">
           <div className="flex flex-row items-center justify-between">
             <a href={`/store/${id}`} className="text-lg font-bold">

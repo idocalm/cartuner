@@ -8,12 +8,9 @@ import React, {
 } from "react";
 
 import Cookies from "js-cookie";
-import { Transport } from "node_modules/engine.io-client/build/esm/transport";
-import { emitter } from "~/lib/emitter";
 
 interface AuthContextType {
   token: string | null;
-  socketId: string | undefined;
   setToken: (token: string | null) => void;
 }
 
@@ -23,9 +20,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [token, setTokenState] = useState<string | null>(null);
-  const [socketId, setSocketId] = useState<string | undefined>(undefined);
-  const [socketConnected, setSocketConnected] = useState<boolean>(false);
-  const [socketTransport, setSocketTransport] = useState<string | null>(null);
 
   /*
   const onSocketConnected = () => {
@@ -84,7 +78,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ token, setToken, socketId }}>
+    <AuthContext.Provider value={{ token, setToken }}>
       {children}
     </AuthContext.Provider>
   );

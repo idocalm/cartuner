@@ -1,5 +1,5 @@
-import { Product } from "@prisma/client";
-import { Pencil, Plus, PlusIcon, ShoppingCart, Store } from "lucide-react";
+import type { Product } from "@prisma/client";
+import { Pencil, ShoppingCart, Store } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";

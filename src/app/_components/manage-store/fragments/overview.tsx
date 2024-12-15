@@ -10,7 +10,7 @@ import RecentSales from "~/app/_components/manage-store/recent-sales";
 import { Overview } from "~/app/_components/manage-store/overview";
 import { api } from "~/trpc/react";
 import Loading from "../../client/shared/loading";
-import { Sale } from "~/app/types";
+import type { Sale } from "~/app/types";
 
 interface OverviewFragmentProps {
   storeId: string;

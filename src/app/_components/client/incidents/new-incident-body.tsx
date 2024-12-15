@@ -19,8 +19,8 @@ import {
   CommandList,
 } from "~/components/ui/command";
 import { api } from "~/trpc/react";
-import { Vehicle } from "@prisma/client";
-import VehicleSketchSelector, { Selection } from "./vehicle-hitbox";
+import type { Vehicle } from "@prisma/client";
+import VehicleSketchSelector, { type Selection } from "./vehicle-hitbox";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 
@@ -163,7 +163,7 @@ const IncidentDate: React.FC<{
         <Calendar
           mode="single"
           selected={date ?? new Date()}
-          onSelect={(date) => setDate(date as Date)}
+          onSelect={(date) => setDate(date! as Date)}
           disabled={(date) =>
             date > new Date() || date < new Date("1900-01-01")
           }
@@ -240,12 +240,10 @@ const NewIncidentBody: React.FC<NewIncidentProps> = ({
   date,
   description,
   hitbox,
-  photos,
   location,
   setDate,
   setVehicleId,
   setDescription,
-  setPhotos,
   setLocation,
   setHitbox,
 }) => {

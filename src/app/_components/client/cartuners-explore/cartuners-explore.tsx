@@ -7,7 +7,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Icons } from "~/components/ui/icons";
 import { useState } from "react";
-import { Store } from "@prisma/client";
+import type { Store } from "@prisma/client";
 import { api } from "~/trpc/react";
 import SearchResults from "./search-results";
 import {

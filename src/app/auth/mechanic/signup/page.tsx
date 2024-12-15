@@ -426,7 +426,7 @@ const SignUpPage = () => {
         duration: 3000,
       });
     },
-    onSuccess: ({ store, user, token }) => {
+    onSuccess: ({ store, token }) => {
       Cookies.set("auth-token", token);
       setToken(token);
 

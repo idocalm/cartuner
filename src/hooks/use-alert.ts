@@ -1,5 +1,3 @@
-import { socket } from "./use-socket";
-
 enum AlertRecipient {
   CLIENT,
   CARTUNER_OWNER,
@@ -16,11 +14,12 @@ enum AlertType {
 
 interface Alert {
   message: string;
-  props: any;
+  props: string; // JSON string
   type: AlertType;
   recipient: AlertRecipient;
 }
 
+/*
 function useAlert() {
   const alert = (alert: Alert) => {
     socket.emit("postAlert", alert);
@@ -28,3 +27,5 @@ function useAlert() {
 }
 
 export { useAlert };
+
+*/

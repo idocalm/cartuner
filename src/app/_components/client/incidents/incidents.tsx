@@ -30,7 +30,7 @@ const Incidents = () => {
 
             <div className="flex flex-col gap-4 items-center justify-center w-full h-full">
               <p className="text-md text-bold text-muted-foreground">
-                You haven't reported any incidents yet
+                You haven&apos;t reported any incidents yet
               </p>
 
               <NewIncidentSheet />

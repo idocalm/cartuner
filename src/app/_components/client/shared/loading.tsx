@@ -1,5 +1,3 @@
-import { Progress } from "~/components/ui/progress";
-import { useEffect, useState } from "react";
 import { Icons } from "~/components/ui/icons";
 
 const Loading: React.FC<{ message: string; title: string }> = ({
@@ -7,15 +5,6 @@ const Loading: React.FC<{ message: string; title: string }> = ({
   title,
 }) => {
   /* animate and interpolate the progress bar */
-
-  const [progress, setProgress] = useState(10);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => (prev + 10) % 100);
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="w-full h-full flex flex-col gap-3 justify-center items-center">

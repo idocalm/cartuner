@@ -94,6 +94,8 @@ export const authRouter = createTRPCRouter({
         user,
       };
     }),
+
+  /*
   google: publicProcedure
     .input(
       z.object({
@@ -101,17 +103,20 @@ export const authRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
+      
       const { tokens } = await googleClient.getToken(input.code);
       const user = await googleClient.verifyIdToken({
         idToken: tokens.id_token!,
         audience: process.env.GOOGLE_CLIENT_ID!,
       });
 
+      
       const { name, email } = user.getPayload()!;
       const existingUser = await ctx.db.clientUser.findUnique({
         where: { email },
       });
     }),
+    */
   getId: publicProcedure.query(async ({ ctx }) => {
     return ctx.user?.id;
   }),

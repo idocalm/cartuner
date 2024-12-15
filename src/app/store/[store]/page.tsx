@@ -24,7 +24,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import ProductsView from "~/app/_components/manage-store/products-view";
 import { toast } from "sonner";
-import { Product } from "@prisma/client";
+import type { Product } from "@prisma/client";
 
 import {
   Sheet,
@@ -217,7 +217,7 @@ const StorePage = () => {
           <SheetHeader>
             <SheetTitle>Your cart</SheetTitle>
             <SheetDescription>
-              Here are the items you've added to your cart
+              Here are the items you&apos;ve added to your cart
             </SheetDescription>
           </SheetHeader>
           <br />

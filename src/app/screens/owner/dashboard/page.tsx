@@ -89,7 +89,7 @@ const OwnerDashboard = () => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {stores.data?.map((store) => (
-          <Card>
+          <Card key={store.id}>
             <CardHeader>
               <CardTitle>
                 <div className="w-full flex flex-row justify-between items-center">

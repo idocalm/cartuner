@@ -1,10 +1,10 @@
 "use client";
 
-import { ClientUser, Incident } from "@prisma/client";
+import type { Incident } from "@prisma/client";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import VehicleSketchSelector, {
-  Selection,
+  type Selection,
 } from "~/app/_components/client/incidents/vehicle-hitbox";
 import ErrorPanel from "~/app/_components/client/shared/error";
 import Loading from "~/app/_components/client/shared/loading";
@@ -66,9 +66,7 @@ const IncidentView: React.FC<{ incident: Incident }> = ({ incident }) => {
   );
 };
 
-const IncidentParticpants: React.FC<{ incident: Incident }> = ({
-  incident,
-}) => {
+const IncidentParticpants: React.FC<{ incident: Incident }> = ({}) => {
   const avatar = api.clients.avatar.useQuery();
 
   // TODO: Implement participants list. Right now it's just the user's avatar.

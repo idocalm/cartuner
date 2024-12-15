@@ -1,10 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  SetStateAction,
-  Dispatch,
-} from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 export interface Selection {
   x: number;
