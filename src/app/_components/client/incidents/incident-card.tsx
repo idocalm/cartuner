@@ -27,12 +27,14 @@ const IncidentCard: React.FC<IncidentCardProps> = ({ incident }) => {
           </Button>
         </div>
         <CardDescription></CardDescription>
-        <p>{formatString(incident.description, 20)}</p>
+        <p>{formatString(incident.description, 120)}</p>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-center">
           <Button variant="outline" className="w-full">
-            <Link href={`/incidents/${incident.id}`}>View incident</Link>
+            <Link href={`/incidents/${incident.id}`} target="_blank">
+              View Incident
+            </Link>
           </Button>
         </div>
       </CardContent>

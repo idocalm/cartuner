@@ -6,7 +6,7 @@ const ErrorPanel: React.FC<{ message: string; desc?: string }> = ({
   desc,
 }) => {
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
+    <div className="flex w-full h-full items-center justify-center">
       <Card className="w-[350px]">
         <CardContent>
           <div className="flex flex-col space-y-4 w-full items-center p-16">
@@ -14,8 +14,18 @@ const ErrorPanel: React.FC<{ message: string; desc?: string }> = ({
             <p className="text-center text-lg font-semibold tracking-tighter">
               {message}
             </p>
-            <div className="text-center text-sm font-semibold tracking-tighter">
+            <div className="text-center text-sm font-semibold tracking-tighter flex-col items-center gap-4">
               {desc}
+
+              <p>
+                If this issue persists, please contact our support team at{" "}
+                <a
+                  href="mailto:support@caruner.com"
+                  className="text-primary-500"
+                >
+                  support@cartuner.com
+                </a>
+              </p>
             </div>
           </div>
         </CardContent>

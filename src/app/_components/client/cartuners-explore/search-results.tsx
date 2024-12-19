@@ -18,7 +18,8 @@ const SearchResults: React.FC<{ stores: Store[] }> = ({ stores }) => {
         <TunerCard
           key={index}
           location={store.address}
-          stars={5}
+          stars={store.stars}
+          reviewsCount={store.reviewCount}
           name={store.name}
           image={store.image}
           id={store.id}

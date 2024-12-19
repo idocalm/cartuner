@@ -1,4 +1,4 @@
-import { OrderStatus } from "@prisma/client";
+import { BiddingStatus, OrderStatus } from "@prisma/client";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -229,8 +229,53 @@ export const clientsRouter = createTRPCRouter({
           id: input,
           ownerId: ctx.user!.id,
         },
+        include: {
+          bid: {
+            include: {
+              bids: true,
+            },
+          },
+        },
       });
     }),
+
+  // delete this
+  demoBids: publicProcedure.query(async ({ ctx }) => {
+    const incident = await ctx.db.incident.findFirst({
+      where: {
+        ownerId: ctx.user!.id,
+      },
+    });
+
+    if (!incident) {
+      throw new Error("No incidents found");
+    }
+
+    const bid = await ctx.db.biddingData.findFirst({
+      where: {
+        incidentId: incident.id,
+      },
+    });
+
+    if (!bid) {
+      throw new Error("No bids found");
+    }
+
+    // create 3 bids with random prices
+    for (let i = 0; i < 3; i++) {
+      await ctx.db.bidding.create({
+        data: {
+          biddingDataId: bid.id,
+          price: Math.floor(Math.random() * 1000),
+          tunerId: "67117b5cc99cf86b0880b1f7",
+          notes: "This is a demo bid",
+          isFlexible: Math.random() > 0.5,
+          description: "This is a demo bid",
+          incidentId: incident.id,
+        },
+      });
+    }
+  }),
 
   deleteVehicle: publicProcedure
     .use(isAuthenticated)
@@ -327,6 +372,45 @@ export const clientsRouter = createTRPCRouter({
         },
         data: {
           notes: input.notes,
+        },
+      });
+    }),
+  createBid: publicProcedure
+    .use(isAuthenticated)
+    .input(
+      z.object({
+        incidentId: z.string(),
+        type: z.enum(["ALL", "FAVOURITES"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const isUserOwner = await ctx.db.incident.findFirst({
+        where: {
+          id: input.incidentId,
+          ownerId: ctx.user!.id,
+        },
+      });
+
+      if (!isUserOwner) {
+        throw new Error("You are not the owner of this incident");
+      }
+
+      const bid = await ctx.db.biddingData.create({
+        data: {
+          incidentId: input.incidentId,
+          type: input.type,
+          dueDate: new Date(new Date().getTime() + 72 * 60 * 60 * 1000), // 72 hours from now
+        },
+      });
+
+      return ctx.db.incident.update({
+        where: {
+          id: input.incidentId,
+          ownerId: ctx.user!.id,
+        },
+        data: {
+          bidId: bid.id,
+          biddingStatus: BiddingStatus.STARTED,
         },
       });
     }),

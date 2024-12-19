@@ -15,8 +15,58 @@ export const storeRouter = createTRPCRouter({
       where: {
         id: input,
       },
+      include: {
+        reviews: true,
+      },
     });
   }),
+  addReview: publicProcedure
+    .input(
+      z.object({
+        storeId: z.string(),
+        stars: z.number(),
+        title: z.string(),
+        description: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const store = await ctx.db.store.findFirst({
+        where: {
+          id: input.storeId,
+        },
+      });
+
+      if (!store) {
+        throw new Error("Store not found");
+      }
+
+      const review = await ctx.db.review.create({
+        data: {
+          title: input.title,
+          description: input.description,
+          storeId: input.storeId,
+          stars: input.stars,
+        },
+      });
+
+      const newRating =
+        store.stars == 0 ? input.stars : (store.stars + input.stars) / 2;
+
+      await ctx.db.store.update({
+        where: {
+          id: input.storeId,
+        },
+        data: {
+          stars: newRating,
+          reviewCount: {
+            increment: 1,
+          },
+        },
+      });
+
+      return review;
+      // update the store rating
+    }),
   fetchByOwner: publicProcedure.use(isAuthenticated).query(async ({ ctx }) => {
     return ctx.db.store.findMany({
       where: {

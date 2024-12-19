@@ -12,6 +12,7 @@ import VehicleView from "../vehicle-view/vehicle-view";
 import type { Vehicle } from "~/app/types";
 import NewVehicleSheet from "./new-vehicle-sheet";
 import VehicleCard from "./vehicle-card";
+import NewIncidentSheet from "../incidents/new-incident-sheet";
 
 const VehicleShowing: React.FC<{
   type: string;
@@ -99,7 +100,7 @@ const MyVehicles: React.FC = () => {
               </TabsList>
               <div className="ml-auto mr-4 flex flex-row gap-3">
                 <NewVehicleSheet />
-                <Button variant="secondary">New Incident</Button>
+                <NewIncidentSheet />
               </div>
             </div>
             <TabsContent value="all" className="border-none p-0 outline-none">

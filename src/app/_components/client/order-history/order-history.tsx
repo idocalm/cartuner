@@ -116,7 +116,9 @@ const OrderNotes: React.FC<{
   return (
     <div className="flex flex-col w-full gap-1">
       <p className="text-lg font-semibold">Notes from the seller</p>
-      <p className="text-md text-muted-foreground">{notes}</p>
+      <p className="text-md text-muted-foreground">
+        {notes || "The seller hasn't provided any notes, per now."}
+      </p>
     </div>
   );
 };

@@ -5,7 +5,13 @@ import ErrorPanel from "~/app/_components/client/shared/error";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
-import { Camera, Pen, ShoppingBag, TriangleAlertIcon } from "lucide-react";
+import {
+  Camera,
+  Pen,
+  ShoppingBag,
+  Star,
+  TriangleAlertIcon,
+} from "lucide-react";
 import { Separator } from "~/components/ui/separator";
 import { Input } from "~/components/ui/input";
 import useCart from "~/hooks/use-cart";
@@ -34,7 +40,19 @@ import {
   SheetTitle,
 } from "~/components/ui/sheet";
 import Cart from "~/app/_components/store/cart";
-
+import ReviewsView from "~/app/_components/store/reviews-view";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import { Textarea } from "~/components/ui/textarea";
 const EditStoreName: React.FC<{
   saveName: (name: string) => void;
   show: boolean;
@@ -142,6 +160,70 @@ const EditCamera: React.FC<{
   );
 };
 
+const ReviewDialog: React.FC<{
+  name: string;
+  onPublish: (title: string, description: string, stars: number) => void;
+}> = ({ name, onPublish }) => {
+  const [stars, setStars] = useState(0);
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">Write a review</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Review {name}</AlertDialogTitle>
+          <AlertDialogDescription>
+            Please avoid writing hateful or inappropriate content. Keep it
+            professional!
+          </AlertDialogDescription>
+          <Separator />
+          <Input
+            placeholder="Title"
+            onChange={(e) => setTitle(e.target.value)}
+            value={title}
+          />
+          <Textarea
+            placeholder="Description"
+            onChange={(e) => setDescription(e.target.value)}
+            value={description}
+          />
+          <Separator />
+          <div className="flex flex-col gap-4">
+            <p className="text-sm">Overall, I'd mark this store as a:</p>
+            <div className="flex flex-row gap-4 w-full items-center justify-center">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Button
+                  variant="outline"
+                  key={i}
+                  onClick={() => setStars(i + 1)}
+                  className={i < stars ? "text-greenish" : ""}
+                >
+                  <Star />
+                </Button>
+              ))}
+            </div>
+          </div>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              onPublish(title, description, stars);
+            }}
+          >
+            Publish
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
+
 const StorePage = () => {
   const { store } = useParams<{ store: string }>();
 
@@ -153,6 +235,12 @@ const StorePage = () => {
   const [cartOpen, setCartOpen] = useState(false);
 
   const updateName = api.store.updateName.useMutation({
+    onSuccess: () => {
+      storeQuery.refetch();
+    },
+  });
+
+  const addReview = api.store.addReview.useMutation({
     onSuccess: () => {
       storeQuery.refetch();
     },
@@ -235,6 +323,19 @@ const StorePage = () => {
           <ShoppingBag className="w-5" />
         </Button>
       </div>
+
+      {storeQuery.data && (
+        <div className="absolute left-5 top-5">
+          <Button
+            variant="outline"
+            onClick={() => {
+              router.back();
+            }}
+          >
+            Back
+          </Button>
+        </div>
+      )}
       <div>
         {storeQuery.data && (
           <>
@@ -339,6 +440,38 @@ const StorePage = () => {
                 });
               }}
             />
+          )}
+        </div>
+
+        <Separator />
+        <div className="flex flex-col gap-4 items-start">
+          <div className="flex flex-row justify-between w-full items-center">
+            <h1 className="text-4xl font-bold tracking-tighter text-center ">
+              Reviews
+            </h1>
+            <ReviewDialog
+              name={storeQuery.data?.name || ""}
+              onPublish={(
+                title: string,
+                description: string,
+                stars: number
+              ) => {
+                addReview.mutate({
+                  storeId: storeQuery.data!.id,
+                  title,
+                  description,
+                  stars,
+                });
+              }}
+            />
+          </div>
+          {storeQuery.isLoading ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-6 w-48" />
+            </div>
+          ) : (
+            <ReviewsView reviews={storeQuery.data?.reviews || []} />
           )}
         </div>
       </div>

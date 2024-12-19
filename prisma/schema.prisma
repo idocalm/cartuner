@@ -18,7 +18,6 @@ model ClientUser {
   avatar String @default("https://via.placeholder.com/150")
   createdAt DateTime @default(now())
   Vehicle Vehicle[]
-  Review Review[]
   StoreOrder StoreOrder[]
 }
 
@@ -29,6 +28,8 @@ model StoreOwnerUser {
   createdAt DateTime @default(now())
   stores Store[]
   ownerAlerts OwnerAlert[]
+
+  Bidding Bidding[]
 }
 
 model Review {
@@ -39,8 +40,6 @@ model Review {
   storeId String @db.ObjectId
   createdAt DateTime @default(now())
   store Store @relation(fields: [storeId], references: [id])
-  writer ClientUser @relation(fields: [writerId], references: [id])
-  writerId String @db.ObjectId
 }
 
 model MechanicUser {
@@ -70,6 +69,7 @@ model Store {
   owner StoreOwnerUser? @relation(fields: [ownerId], references: [id])
   mechanics MechanicsStores[]
   stars Int @default(0)
+  reviewCount Int @default(0)
   reviews Review[] 
   products Product[]
   orders StoresOrders[]
@@ -100,6 +100,15 @@ model Vehicle {
   notes String @default("")
 }
 
+enum BiddingStatus {
+  INIT
+  STARTED
+  IN_PROGRESS
+  FINISHED
+  CANCELLED
+  REJECTED
+}
+
 model Incident {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   description String
@@ -112,7 +121,34 @@ model Incident {
   status String @default("Pending")
   ownerId String @db.ObjectId
   createdAt DateTime @default(now())
+  biddingStatus BiddingStatus @default(INIT)
+  bid BiddingData? @relation(name: "IncidentBid")
+  bidId String? @db.ObjectId
+}
 
+model BiddingData {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  type String @default("ALL") 
+  createdAt DateTime @default(now())
+  dueDate DateTime
+  incidentId String @db.ObjectId @unique
+  incident Incident  @relation(name: "IncidentBid", fields: [incidentId], references: [id])
+  bids Bidding[] @relation
+}
+
+model Bidding {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  price Float
+  description String
+  isFlexible Boolean @default(false)
+  createdAt DateTime @default(now())
+  tunerId String @db.ObjectId
+  tuner StoreOwnerUser @relation(fields: [tunerId], references: [id])
+  biddingDataId String @db.ObjectId
+  biddingData BiddingData @relation(fields: [biddingDataId], references: [id])
+  status BiddingStatus @default(INIT)
+  notes String @default("")
+  incidentId String @db.ObjectId
 }
 
 
