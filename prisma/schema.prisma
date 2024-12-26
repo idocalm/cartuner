@@ -28,8 +28,6 @@ model StoreOwnerUser {
   createdAt DateTime @default(now())
   stores Store[]
   ownerAlerts OwnerAlert[]
-
-  Bidding Bidding[]
 }
 
 model Review {
@@ -73,6 +71,8 @@ model Store {
   reviews Review[] 
   products Product[]
   orders StoresOrders[]
+
+  Bidding Bidding[]
 }
 
 model MechanicsStores {
@@ -142,8 +142,8 @@ model Bidding {
   description String
   isFlexible Boolean @default(false)
   createdAt DateTime @default(now())
-  tunerId String @db.ObjectId
-  tuner StoreOwnerUser @relation(fields: [tunerId], references: [id])
+  storeId String @db.ObjectId
+  store Store @relation(fields: [storeId], references: [id])
   biddingDataId String @db.ObjectId
   biddingData BiddingData @relation(fields: [biddingDataId], references: [id])
   status BiddingStatus @default(INIT)

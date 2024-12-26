@@ -3,7 +3,7 @@
 import { toast } from "sonner";
 import InitiateBidButton from "./initiate-button";
 import { useState } from "react";
-import { Bidding, BiddingData, BiddingStatus } from "@prisma/client";
+import { type Bidding, type BiddingData, BiddingStatus } from "@prisma/client";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Separator } from "~/components/ui/separator";
 import { api } from "~/trpc/react";
@@ -36,7 +36,7 @@ const BidData: React.FC<{ data?: BiddingData; bids?: Bidding[] }> = ({
         <BidOffers bids={bids || []} data={data} />
         <BidViews {...data} />
       </div>
-      <BidChat data={data} />
+      <BidChat data={data} bids={bids || []} />
     </div>
   );
 };

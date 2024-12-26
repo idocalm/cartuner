@@ -110,6 +110,10 @@ const IncidentPage = () => {
     );
   }
 
+  // TODO: Format the incident ID to be more readable
+
+  // format the bids to the bid[] type, from the incidentQuery.data.bid.bids[] type
+
   return (
     <div className="flex flex-col items-start w-full h-full">
       <div className="h-full w-full px-4 py-6 lg:px-8 flex flex-col gap-4">

@@ -232,7 +232,15 @@ export const clientsRouter = createTRPCRouter({
         include: {
           bid: {
             include: {
-              bids: true,
+              bids: {
+                include: {
+                  store: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -267,7 +275,7 @@ export const clientsRouter = createTRPCRouter({
         data: {
           biddingDataId: bid.id,
           price: Math.floor(Math.random() * 1000),
-          tunerId: "67117b5cc99cf86b0880b1f7",
+          storeId: "67117b5cc99cf86b0880b1f7",
           notes: "This is a demo bid",
           isFlexible: Math.random() > 0.5,
           description: "This is a demo bid",

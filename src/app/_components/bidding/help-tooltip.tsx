@@ -28,8 +28,9 @@ const HelpTooltip: React.FC = () => {
             <Separator />
             <p>
               Once you start the bid, tuners will have 72 hours to supply their
-              offers. Once the process is over, you'll be able to continue with
-              an offer of your choice, or enter a negotiation with the tuner.
+              offers. Once the process is over, you&apos;ll be able to continue
+              with an offer of your choice, or enter a negotiation with the
+              tuner.
             </p>
             <Separator />
 

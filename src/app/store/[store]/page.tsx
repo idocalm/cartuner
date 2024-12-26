@@ -194,7 +194,7 @@ const ReviewDialog: React.FC<{
           />
           <Separator />
           <div className="flex flex-col gap-4">
-            <p className="text-sm">Overall, I'd mark this store as a:</p>
+            <p className="text-sm">Overall, I&apos;d mark this store as a:</p>
             <div className="flex flex-row gap-4 w-full items-center justify-center">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Button

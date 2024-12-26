@@ -7,10 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import useCart, { CartProduct } from "~/hooks/use-cart";
+import useCart, { type CartProduct } from "~/hooks/use-cart";
 import { useRouter, usePathname } from "next/navigation";
-import { useAuth } from "../auth-context";
-import { api } from "~/trpc/react";
 
 interface CartItemProps extends CartProduct {
   remove: (productId: string) => void;

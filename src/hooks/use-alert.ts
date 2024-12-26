@@ -12,12 +12,14 @@ enum AlertType {
   PURCHASED_MESSAGE,
 }
 
+/*
 interface Alert {
   message: string;
   props: string; // JSON string
   type: AlertType;
   recipient: AlertRecipient;
 }
+*/
 
 /*
 function useAlert() {

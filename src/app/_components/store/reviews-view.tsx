@@ -1,11 +1,10 @@
-import { Review } from "@prisma/client";
+import type { Review } from "@prisma/client";
 import { Star } from "lucide-react";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
   CardFooter,
 } from "~/components/ui/card";
 import {

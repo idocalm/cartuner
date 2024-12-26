@@ -53,7 +53,7 @@ const LeadingBid: React.FC<{ bid: Bidding }> = ({ bid }) => {
           </div>
         </CardTitle>
         <CardDescription>
-          {bid.tunerId} has submitted the leading bid of ${bid.price}.
+          {bid.storeId} has submitted the leading bid of ${bid.price}.
         </CardDescription>
         <CardContent>
           <div className="flex flex-col justify-center py-4 gap-4">
@@ -64,7 +64,7 @@ const LeadingBid: React.FC<{ bid: Bidding }> = ({ bid }) => {
                   {bid.isFlexible ? (
                     <p>
                       You can submit a counter offer to the tuner. Once the
-                      tuner accepts, you'll be able to secure the deal.
+                      tuner accepts, you&apos;ll be able to secure the deal.
                     </p>
                   ) : (
                     <p>
@@ -96,7 +96,7 @@ const Bid: React.FC<{ bid: Bidding }> = ({ bid }) => {
   return (
     <div className="flex flex-row gap-4 w-full rounded-md p-2 border">
       <div className="flex flex-col gap-2">
-        <span className="text-lg font-semibold">{bid.tunerId}</span>
+        <span className="text-lg font-semibold">{bid.storeId}</span>
         <span className="text-sm font-semibold">{bid.price}</span>
       </div>
       <Button variant="secondary">View</Button>
